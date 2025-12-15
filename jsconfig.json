@@ -1,0 +1,7 @@
+{
+  "vueCompilerOptions": {
+    "target": 3,
+    "globalTypesPath": "./vue-global.d.ts"
+  }
+}
+

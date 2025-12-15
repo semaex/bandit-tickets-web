@@ -1,0 +1,42 @@
+# Cursor Rules for Bandit Tickets Web
+
+## Component Naming
+- **Always use PascalCase for component file names** (e.g., `HomePage.vue`, `MicrositeLayout.vue`, `UserProfile.vue`)
+- Component file names should match their component name in PascalCase
+- When referencing components in templates, use PascalCase (e.g., `<HomePage />`, `<MicrositeLayout />`)
+
+## Vue/Nuxt Best Practices
+- Use `<script setup lang="ts">` for all Vue components
+- Prefer Composition API over Options API
+- Use TypeScript for type safety
+- Follow Nuxt 3 conventions for auto-imports (components, composables, utils)
+
+## CSS/BEM Naming Convention
+- **Always use BEM (Block Element Modifier) pattern for CSS classes**
+- Format: `ComponentName-element-subelement--modifier`
+- Example: `HomePage-hero-main-title--active`
+- Each HTML element should have at least one BEM class for styling
+- Block: component name in PascalCase (e.g., `HomePage`, `MicrositeLayout`)
+- Element: descriptive element name in kebab-case (e.g., `title`, `main-title`)
+- Modifier: optional state or variant, prefixed with `--` (e.g., `--active`, `--disabled`)
+
+## Code Style
+- Use 2 spaces for indentation
+- Use single quotes for strings in JavaScript/TypeScript
+- Use double quotes for HTML attributes
+- Always include closing tags in templates
+- **Never use `scoped` in `<style>` tags** - styles should be global, use BEM naming convention for specificity instead
+- **Always use `lang="scss"` in `<style>` tags** - all styles should use SCSS syntax
+- **Always use relative paths for imports** - use `./` or `../` instead of `~` alias
+
+## File Structure
+- Components go in `components/` directory
+- Pages go in `pages/` directory
+- Composables go in `composables/` directory
+- Server API routes go in `server/api/` directory
+
+## Development
+- Local development URL: `http://devel.bandit.tickets:3000/`
+- Application runs on port 3000
+- Use `docker-compose up` to start the development environment
+

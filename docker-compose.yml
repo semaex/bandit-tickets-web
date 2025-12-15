@@ -1,0 +1,19 @@
+services:
+  bandit_tickets_web_node:
+    image: node:20.19-alpine
+    container_name: bandit_tickets_web_node
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - BANDIT_TICKETS_CORE_URL=${BANDIT_TICKETS_CORE_URL}
+    networks:
+      - bandit-platform-network
+
+networks:
+  bandit-platform-network:
+    external: true
+
