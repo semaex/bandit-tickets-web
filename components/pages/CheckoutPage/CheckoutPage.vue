@@ -207,8 +207,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import MicrositeLayout from '../layout/MicrositeLayout.vue'
-import { useCheckout } from '../../composables/useCheckout'
+import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import { useCheckout } from '../../../composables/useCheckout'
 
 interface CartItem {
   id: string
@@ -550,7 +550,7 @@ const handleSubmit = async () => {
     align-items: flex-start;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
-    background-color: rgba(243, 48, 74, 0.05);
+    background-color: rgba(243, 67, 22, 0.05);
     border: 1px solid var(--color-primary-light-20);
     border-radius: var(--radius-lg);
   }

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import MicrositeLayout from '../layout/MicrositeLayout.vue'
+import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 </script>
 
 <style lang="scss">

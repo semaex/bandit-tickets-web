@@ -206,12 +206,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import MicrositeLayout from '../layout/MicrositeLayout.vue'
-import EventInfo from '../common/EventInfo.vue'
-import SaleStatus from '../common/SaleStatus.vue'
-import TicketCard from '../common/TicketCard.vue'
-import GenreChip from '../common/GenreChip.vue'
-import { useCheckout } from '../../composables/useCheckout'
+import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import EventInfo from '../../common/EventInfo/EventInfo.vue'
+import SaleStatus from '../../common/SaleStatus/SaleStatus.vue'
+import TicketCard from '../../common/TicketCard/TicketCard.vue'
+import GenreChip from '../../common/GenreChip/GenreChip.vue'
+import { useCheckout } from '../../../composables/useCheckout'
 
 interface Ticket {
   id: string
@@ -436,7 +436,8 @@ onUnmounted(() => {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-foreground);
-    margin: var(--spacing-md) 0 0 0;
+    margin: 0 0 0 0;
+    line-height: 1.2;
 
     @media (min-width: 768px) {
       font-size: 2.25rem;

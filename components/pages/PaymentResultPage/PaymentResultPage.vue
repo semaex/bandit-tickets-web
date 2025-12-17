@@ -172,8 +172,8 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import MicrositeLayout from '../layout/MicrositeLayout.vue'
-import { useCheckout } from '../../composables/useCheckout'
+import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import { useCheckout } from '../../../composables/useCheckout'
 
 interface PaymentData {
   success: boolean

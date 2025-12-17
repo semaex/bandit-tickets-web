@@ -3,6 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import CheckoutPage from '../components/pages/CheckoutPage.vue'
+import CheckoutPage from '../components/pages/CheckoutPage/CheckoutPage.vue'
 </script>
 
