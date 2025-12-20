@@ -13,30 +13,30 @@
 
           <!-- Success Message -->
           <div class="PaymentResultPage-message">
-            <h1 class="PaymentResultPage-title">¡Compra completada!</h1>
+            <h1 class="PaymentResultPage-title">{{ trans('paymentResultPage.success_title') }}</h1>
             <p class="PaymentResultPage-subtitle">
-              Tu pedido se ha procesado correctamente
+              {{ trans('paymentResultPage.success_subtitle') }}
             </p>
             <p v-if="paymentData?.orderNumber" class="PaymentResultPage-order">
-              Nº de pedido:
+              {{ trans('paymentResultPage.order_number') }}
               <span class="PaymentResultPage-order-number">{{ paymentData.orderNumber }}</span>
             </p>
           </div>
 
           <!-- Event Details Card -->
           <div class="PaymentResultPage-card">
-            <h2 class="PaymentResultPage-card-title">Detalles del evento</h2>
+            <h2 class="PaymentResultPage-card-title">{{ trans('paymentResultPage.event_details') }}</h2>
             
             <div class="PaymentResultPage-event-details">
               <h3 class="PaymentResultPage-event-title">
-                {{ paymentData?.eventTitle || 'Evento' }}
+                {{ paymentData?.eventTitle || trans('paymentResultPage.event') }}
               </h3>
               
               <div class="PaymentResultPage-event-info">
                 <svg class="PaymentResultPage-event-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span>{{ paymentData?.eventDate || 'Fecha del evento' }}</span>
+                <span>{{ paymentData?.eventDate || trans('paymentResultPage.event_date') }}</span>
               </div>
               
               <div class="PaymentResultPage-event-info">
@@ -44,11 +44,11 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>{{ paymentData?.eventVenue || 'Lugar del evento' }}</span>
+                <span>{{ paymentData?.eventVenue || trans('paymentResultPage.event_venue') }}</span>
               </div>
 
               <div v-if="paymentData?.items && paymentData.items.length > 0" class="PaymentResultPage-tickets">
-                <p class="PaymentResultPage-tickets-title">Entradas:</p>
+                <p class="PaymentResultPage-tickets-title">{{ trans('paymentResultPage.tickets') }}</p>
                 <ul class="PaymentResultPage-tickets-list">
                   <li
                     v-for="(item, index) in paymentData.items"
@@ -71,34 +71,34 @@
             </div>
             <div>
               <h3 class="PaymentResultPage-email-title">
-                Hemos enviado tus entradas por email
+                {{ trans('paymentResultPage.email_title') }}
               </h3>
               <p class="PaymentResultPage-email-text">
-                Revisa tu bandeja de entrada en
-                <span class="PaymentResultPage-email-address">{{ paymentData?.email || 'tu correo' }}</span>.
-                Si no lo encuentras, revisa la carpeta de spam.
+                {{ trans('paymentResultPage.email_text') }}
+                <span class="PaymentResultPage-email-address">{{ paymentData?.email || 'tu correo' }}</span>
+                {{ trans('paymentResultPage.email_text_2') }}
               </p>
             </div>
           </div>
 
           <!-- Download Section -->
           <div class="PaymentResultPage-card">
-            <h3 class="PaymentResultPage-card-title">Descargar entradas</h3>
+            <h3 class="PaymentResultPage-card-title">{{ trans('paymentResultPage.download_title') }}</h3>
             <p class="PaymentResultPage-download-text">
-              También puedes descargar tus entradas directamente desde aquí:
+              {{ trans('paymentResultPage.download_text') }}
             </p>
             <button class="PaymentResultPage-download-button">
               <svg class="PaymentResultPage-download-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Descargar entradas (PDF)
+              {{ trans('paymentResultPage.download_button') }}
             </button>
           </div>
 
           <!-- Back to Event -->
           <div class="PaymentResultPage-back">
             <button class="PaymentResultPage-back-button" @click="handleBack">
-              Volver al evento
+              {{ trans('paymentResultPage.back_to_event') }}
             </button>
           </div>
         </div>
@@ -114,27 +114,27 @@
 
           <!-- Error Message -->
           <div class="PaymentResultPage-message">
-            <h1 class="PaymentResultPage-title">El pago no se ha completado</h1>
+            <h1 class="PaymentResultPage-title">{{ trans('paymentResultPage.error_title') }}</h1>
             <p class="PaymentResultPage-subtitle">
-              Ha ocurrido un problema al procesar tu pago
+              {{ trans('paymentResultPage.error_subtitle') }}
             </p>
           </div>
 
           <!-- Error Details -->
           <div class="PaymentResultPage-error-details">
-            <h3 class="PaymentResultPage-error-title">¿Qué ha podido pasar?</h3>
+            <h3 class="PaymentResultPage-error-title">{{ trans('paymentResultPage.error_details_title') }}</h3>
             <ul class="PaymentResultPage-error-list">
               <li class="PaymentResultPage-error-item">
-                La transacción fue cancelada o rechazada por tu banco
+                {{ trans('paymentResultPage.error_item_1') }}
               </li>
               <li class="PaymentResultPage-error-item">
-                Los datos de la tarjeta no son correctos
+                {{ trans('paymentResultPage.error_item_2') }}
               </li>
               <li class="PaymentResultPage-error-item">
-                Se ha agotado el tiempo de la sesión de pago
+                {{ trans('paymentResultPage.error_item_3') }}
               </li>
               <li class="PaymentResultPage-error-item">
-                Fondos insuficientes en la tarjeta
+                {{ trans('paymentResultPage.error_item_4') }}
               </li>
             </ul>
           </div>
@@ -145,20 +145,20 @@
               <svg class="PaymentResultPage-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              Intentar de nuevo
+              {{ trans('paymentResultPage.retry_button') }}
             </button>
             
             <button class="PaymentResultPage-action-button PaymentResultPage-action-button--secondary" @click="handleBack">
               <svg class="PaymentResultPage-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
-              Volver al evento
+              {{ trans('paymentResultPage.back_to_event') }}
             </button>
           </div>
 
           <!-- Help Text -->
           <p class="PaymentResultPage-help">
-            Si el problema persiste, contacta con nosotros en
+            {{ trans('paymentResultPage.help_text') }}
             <a href="mailto:soporte@ejemplo.com" class="PaymentResultPage-help-link">
               soporte@ejemplo.com
             </a>
@@ -174,6 +174,15 @@ import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import { useCheckout } from '../../../composables/useCheckout'
+import { useAppLanguage } from '../../../composables/useAppLanguage'
+import paymentResultPageTranslations from './payment-result-page.i18n.json'
+import { translationService } from '../../../services/translation.service'
+
+// Load translations
+translationService.addTranslations('paymentResultPage', paymentResultPageTranslations)
+
+// Use translation composable
+const { trans } = useAppLanguage()
 
 interface PaymentData {
   success: boolean

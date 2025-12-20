@@ -11,7 +11,7 @@
             <svg class="CheckoutPage-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            <span class="CheckoutPage-back-text">Volver</span>
+            <span class="CheckoutPage-back-text">{{ trans('checkoutPage.back') }}</span>
           </button>
         </div>
       </header>
@@ -19,12 +19,12 @@
       <main class="CheckoutPage-main">
         <div class="container">
           <div class="CheckoutPage-wrapper">
-            <h1 class="CheckoutPage-title">Finalizar compra</h1>
+            <h1 class="CheckoutPage-title">{{ trans('checkoutPage.title') }}</h1>
 
             <div v-if="!checkoutData || checkoutData.items.length === 0" class="CheckoutPage-empty">
-              <h2 class="CheckoutPage-empty-title">No hay entradas seleccionadas</h2>
+              <h2 class="CheckoutPage-empty-title">{{ trans('checkoutPage.empty_title') }}</h2>
               <button class="CheckoutPage-empty-button" @click="handleBack">
-                Volver al evento
+                {{ trans('checkoutPage.back_to_event') }}
               </button>
             </div>
 
@@ -40,16 +40,16 @@
                       </svg>
                     </div>
                     <div>
-                      <h2 class="CheckoutPage-card-title">Datos del comprador</h2>
+                      <h2 class="CheckoutPage-card-title">{{ trans('checkoutPage.buyer_data_title') }}</h2>
                       <p class="CheckoutPage-card-subtitle">
-                        Necesitamos tu información para enviarte las entradas
+                        {{ trans('checkoutPage.buyer_data_subtitle') }}
                       </p>
                     </div>
                   </div>
 
                   <form @submit.prevent="handleSubmit" class="CheckoutPage-form">
                     <div class="CheckoutPage-form-group">
-                      <label for="name" class="CheckoutPage-label">Nombre completo</label>
+                      <label for="name" class="CheckoutPage-label">{{ trans('checkoutPage.full_name_label') }}</label>
                       <div class="CheckoutPage-input-wrapper">
                         <svg class="CheckoutPage-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -59,14 +59,14 @@
                           v-model="formData.name"
                           type="text"
                           class="CheckoutPage-input"
-                          placeholder="Tu nombre y apellidos"
+                          :placeholder="trans('checkoutPage.full_name_placeholder')"
                           required
                         />
                       </div>
                     </div>
 
                     <div class="CheckoutPage-form-group">
-                      <label for="email" class="CheckoutPage-label">Email</label>
+                      <label for="email" class="CheckoutPage-label">{{ trans('checkoutPage.email_label') }}</label>
                       <div class="CheckoutPage-input-wrapper">
                         <svg class="CheckoutPage-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -76,12 +76,12 @@
                           v-model="formData.email"
                           type="email"
                           class="CheckoutPage-input"
-                          placeholder="tu@email.com"
+                          :placeholder="trans('checkoutPage.email_placeholder')"
                           required
                         />
                       </div>
                       <p class="CheckoutPage-hint">
-                        Recibirás las entradas en este email
+                        {{ trans('checkoutPage.email_hint') }}
                       </p>
                     </div>
 
@@ -93,10 +93,10 @@
                         class="CheckoutPage-checkbox"
                       />
                       <label for="terms" class="CheckoutPage-checkbox-label">
-                        Acepto los
-                        <a href="#" class="CheckoutPage-link">términos y condiciones</a>
-                        y la
-                        <a href="#" class="CheckoutPage-link">política de privacidad</a>
+                        {{ trans('checkoutPage.accept_terms_prefix') }}
+                        <a href="#" class="CheckoutPage-link">{{ trans('checkoutPage.terms_and_conditions') }}</a>
+                        {{ trans('checkoutPage.and_the') }}
+                        <a href="#" class="CheckoutPage-link">{{ trans('checkoutPage.privacy_policy') }}</a>
                       </label>
                     </div>
 
@@ -107,7 +107,7 @@
                         class="CheckoutPage-submit-button"
                         :disabled="isSubmitting"
                       >
-                        {{ isSubmitting ? 'Procesando...' : 'Pagar ahora' }}
+                        {{ isSubmitting ? trans('checkoutPage.processing') : trans('checkoutPage.pay_now') }}
                       </button>
                     </div>
                   </form>
@@ -119,9 +119,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                   <div>
-                    <p class="CheckoutPage-security-title">Compra segura</p>
+                    <p class="CheckoutPage-security-title">{{ trans('checkoutPage.secure_purchase_title') }}</p>
                     <p class="CheckoutPage-security-text">
-                      Tus datos están protegidos con encriptación SSL de 256 bits
+                      {{ trans('checkoutPage.secure_purchase_text') }}
                     </p>
                   </div>
                 </div>
@@ -146,7 +146,7 @@
 
                   <!-- Items -->
                   <div class="CheckoutPage-items">
-                    <h4 class="CheckoutPage-items-title">Tus entradas</h4>
+                    <h4 class="CheckoutPage-items-title">{{ trans('checkoutPage.your_tickets') }}</h4>
                     <div
                       v-for="item in checkoutData.items"
                       :key="item.id"
@@ -164,13 +164,13 @@
                   <!-- Totals -->
                   <div class="CheckoutPage-totals">
                     <div class="CheckoutPage-total-line">
-                      <span class="CheckoutPage-total-label">Subtotal</span>
+                      <span class="CheckoutPage-total-label">{{ trans('checkoutPage.subtotal') }}</span>
                       <span class="CheckoutPage-total-value">
                         {{ checkoutData.subtotal.toFixed(2) }} €
                       </span>
                     </div>
                     <div class="CheckoutPage-total-line">
-                      <span class="CheckoutPage-total-label">Gastos de gestión</span>
+                      <span class="CheckoutPage-total-label">{{ trans('checkoutPage.service_fee') }}</span>
                       <span class="CheckoutPage-total-value">
                         {{ checkoutData.serviceFee.toFixed(2) }} €
                       </span>
@@ -179,7 +179,7 @@
 
                   <!-- Total -->
                   <div class="CheckoutPage-final-total">
-                    <span class="CheckoutPage-final-total-label">Total</span>
+                    <span class="CheckoutPage-final-total-label">{{ trans('checkoutPage.total') }}</span>
                     <span class="CheckoutPage-final-total-value">
                       {{ checkoutData.total.toFixed(2) }} €
                     </span>
@@ -209,6 +209,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import { useCheckout } from '../../../composables/useCheckout'
+import { useAppLanguage } from '../../../composables/useAppLanguage'
+import checkoutPageTranslations from './checkout-page.i18n.json'
+import { translationService } from '../../../services/translation.service'
+
+// Load translations
+translationService.addTranslations('checkoutPage', checkoutPageTranslations)
+
+// Use translation composable
+const { trans } = useAppLanguage()
 
 interface CartItem {
   id: string
@@ -251,12 +260,12 @@ const handleBack = () => {
 
 const handleSubmit = async () => {
   if (!formData.value.email || !formData.value.name) {
-    alert('Por favor, completa todos los campos.')
+    alert(trans('checkoutPage.alert_complete_fields'))
     return
   }
 
   if (!acceptTerms.value) {
-    alert('Debes aceptar los términos y condiciones para continuar.')
+    alert(trans('checkoutPage.alert_accept_terms'))
     return
   }
 

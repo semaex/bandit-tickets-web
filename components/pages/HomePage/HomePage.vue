@@ -1,14 +1,23 @@
 <template>
   <MicrositeLayout>
     <div class="HomePage">
-      <h1 class="HomePage-title">Bandit Tickets</h1>
-      <p class="HomePage-description">Welcome to the ticket sales platform</p>
+      <h1 class="HomePage-title">{{ trans('homePage.title') }}</h1>
+      <p class="HomePage-description">{{ trans('homePage.description') }}</p>
     </div>
   </MicrositeLayout>
 </template>
 
 <script setup lang="ts">
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import { useAppLanguage } from '../../../composables/useAppLanguage'
+import homePageTranslations from './home-page.i18n.json'
+import { translationService } from '../../../services/translation.service'
+
+// Load translations
+translationService.addTranslations('homePage', homePageTranslations)
+
+// Use translation composable
+const { trans } = useAppLanguage()
 </script>
 
 <style lang="scss">

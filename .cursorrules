@@ -27,7 +27,9 @@
 - Always include closing tags in templates
 - **Never use `scoped` in `<style>` tags** - styles should be global, use BEM naming convention for specificity instead
 - **Always use `lang="scss"` in `<style>` tags** - all styles should use SCSS syntax
-- **Always use relative paths for imports** - use `./` or `../` instead of `~` alias
+- **Always use relative paths for imports** - use `./` or `../` instead of `~` or `~/` alias
+- **Never use path aliases** - always use relative imports (e.g., `../services/translation.service` instead of `~/services/translation.service`)
+- **Translation keys must use snake_case** - all translation keys in i18n JSON files should use snake_case (e.g., `select_tickets`, `event_details`, `order_number`)
 
 ## File Structure
 - Components go in `components/` directory

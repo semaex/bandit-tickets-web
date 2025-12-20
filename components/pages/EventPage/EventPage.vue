@@ -66,7 +66,7 @@
                 ref="ticketSectionRef"
                 class="EventPage-tickets"
               >
-                <h2 class="EventPage-section-title">Selecciona tus entradas</h2>
+                <h2 class="EventPage-section-title">{{ trans('eventPage.select_tickets') }}</h2>
                 <div class="EventPage-tickets-list">
                   <TicketCard
                     v-for="ticket in eventData.tickets"
@@ -85,7 +85,7 @@
               <div class="EventPage-info-sections">
                 <!-- Genres -->
                 <section class="EventPage-section">
-                  <h2 class="EventPage-section-title">Géneros</h2>
+                  <h2 class="EventPage-section-title">{{ trans('eventPage.genres') }}</h2>
                   <div class="EventPage-genres">
                     <GenreChip
                       v-for="genre in eventData.genres"
@@ -97,7 +97,7 @@
 
                 <!-- Description -->
                 <section class="EventPage-section">
-                  <h2 class="EventPage-section-title">Sobre el evento</h2>
+                  <h2 class="EventPage-section-title">{{ trans('eventPage.about_event') }}</h2>
                   <div class="EventPage-description">
                     <p
                       v-for="(paragraph, index) in descriptionParagraphs"
@@ -111,7 +111,7 @@
 
                 <!-- Conditions -->
                 <section class="EventPage-section EventPage-section--bordered">
-                  <h2 class="EventPage-section-title">Condiciones</h2>
+                  <h2 class="EventPage-section-title">{{ trans('eventPage.conditions') }}</h2>
                   <p class="EventPage-conditions">
                     {{ eventData.conditions }}
                   </p>
@@ -122,7 +122,7 @@
             <!-- Right: Sticky Purchase Summary -->
             <aside v-if="isOnSale" class="EventPage-summary">
               <div class="EventPage-summary-card">
-                <h3 class="EventPage-summary-title">Resumen de compra</h3>
+                <h3 class="EventPage-summary-title">{{ trans('eventPage.purchase_summary') }}</h3>
                 
                 <div v-if="selectedTickets.length > 0" class="EventPage-summary-items">
                   <div
@@ -138,20 +138,20 @@
                     </span>
                   </div>
                   <div class="EventPage-summary-line">
-                    <span class="EventPage-summary-label">Subtotal</span>
+                    <span class="EventPage-summary-label">{{ trans('eventPage.subtotal') }}</span>
                     <span class="EventPage-summary-value">{{ subtotal.toFixed(2) }} €</span>
                   </div>
                   <div class="EventPage-summary-line">
-                    <span class="EventPage-summary-label">Gastos de gestión (10%)</span>
+                    <span class="EventPage-summary-label">{{ trans('eventPage.service_fee') }}</span>
                     <span class="EventPage-summary-value">{{ serviceFee.toFixed(2) }} €</span>
                   </div>
                 </div>
                 <p v-else class="EventPage-summary-empty">
-                  No has seleccionado entradas
+                  {{ trans('eventPage.no_tickets_selected') }}
                 </p>
 
                 <div class="EventPage-summary-total">
-                  <span class="EventPage-summary-total-label">Total</span>
+                  <span class="EventPage-summary-total-label">{{ trans('eventPage.total') }}</span>
                   <span class="EventPage-summary-total-value">{{ totalPrice.toFixed(2) }} €</span>
                 </div>
 
@@ -160,7 +160,7 @@
                   :disabled="totalTickets === 0"
                   @click="handleCtaClick"
                 >
-                  {{ totalTickets > 0 ? 'Continuar al pago' : 'Selecciona tus entradas' }}
+                  {{ totalTickets > 0 ? trans('eventPage.continue_to_payment') : trans('eventPage.select_tickets_button') }}
                 </button>
               </div>
             </aside>
@@ -174,7 +174,7 @@
           <div class="EventPage-mobile-cta-content">
             <div class="EventPage-mobile-cta-info">
               <p v-if="totalTickets > 0" class="EventPage-mobile-cta-tickets">
-                {{ totalTickets }} {{ totalTickets === 1 ? 'entrada' : 'entradas' }}
+                {{ totalTickets }} {{ totalTickets === 1 ? trans('eventPage.ticket') : trans('eventPage.tickets') }}
               </p>
               <p
                 v-if="totalTickets > 0"
@@ -183,7 +183,7 @@
                 {{ totalPrice.toFixed(2) }} €
               </p>
               <p v-else class="EventPage-mobile-cta-from">
-                Desde {{ minPrice.toFixed(2) }} €
+                {{ trans('eventPage.from') }} {{ minPrice.toFixed(2) }} €
               </p>
             </div>
             <button
@@ -191,7 +191,7 @@
               :disabled="totalTickets === 0"
               @click="handleCtaClick"
             >
-              {{ totalTickets > 0 ? 'Continuar al pago' : 'Selecciona entradas' }}
+              {{ totalTickets > 0 ? trans('eventPage.continue_to_payment') : trans('eventPage.select_tickets_button_mobile') }}
             </button>
           </div>
         </div>
@@ -212,6 +212,15 @@ import SaleStatus from '../../common/SaleStatus/SaleStatus.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
 import GenreChip from '../../common/GenreChip/GenreChip.vue'
 import { useCheckout } from '../../../composables/useCheckout'
+import { useAppLanguage } from '../../../composables/useAppLanguage'
+import eventPageTranslations from './event-page.i18n.json'
+import { translationService } from '../../../services/translation.service'
+
+// Load translations
+translationService.addTranslations('eventPage', eventPageTranslations)
+
+// Use translation composable
+const { trans } = useAppLanguage()
 
 interface Ticket {
   id: string

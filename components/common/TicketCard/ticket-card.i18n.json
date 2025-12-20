@@ -1,0 +1,28 @@
+{
+  "en-GB": {
+    "sold_out": "Sold out",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity"
+  },
+  "es-ES": {
+    "sold_out": "Agotadas",
+    "decrease_quantity": "Reducir cantidad",
+    "increase_quantity": "Aumentar cantidad"
+  },
+  "ca-ES": {
+    "sold_out": "Esgotades",
+    "decrease_quantity": "Reduir quantitat",
+    "increase_quantity": "Augmentar quantitat"
+  },
+  "eu-ES": {
+    "sold_out": "Agortuta",
+    "decrease_quantity": "Kantitatea gutxitu",
+    "increase_quantity": "Kantitatea handitu"
+  },
+  "gl-ES": {
+    "sold_out": "Esgotadas",
+    "decrease_quantity": "Reducir cantidade",
+    "increase_quantity": "Aumentar cantidade"
+  }
+}
+

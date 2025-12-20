@@ -9,6 +9,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     banditTicketsCoreUrl: process.env.BANDIT_TICKETS_CORE_URL || '',
     public: {}
+  },
+  vite: {
+    server: {
+      allowedHosts: ['devel.bandit.tickets']
+    }
   }
 })
 

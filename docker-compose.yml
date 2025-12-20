@@ -11,9 +11,9 @@ services:
     environment:
       - BANDIT_TICKETS_CORE_URL=${BANDIT_TICKETS_CORE_URL}
     networks:
-      - bandit-platform-network
+      - matrix-network
 
 networks:
-  bandit-platform-network:
+  matrix-network:
     external: true
 

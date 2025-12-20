@@ -1,0 +1,22 @@
+{
+  "en-GB": {
+    "title": "Bandit Tickets",
+    "description": "Welcome to the ticket sales platform"
+  },
+  "es-ES": {
+    "title": "Bandit Tickets",
+    "description": "Bienvenido a la plataforma de venta de entradas"
+  },
+  "ca-ES": {
+    "title": "Bandit Tickets",
+    "description": "Benvingut a la plataforma de venda d'entrades"
+  },
+  "eu-ES": {
+    "title": "Bandit Tickets",
+    "description": "Ongi etorri sarrerak saltzeko plataformara"
+  },
+  "gl-ES": {
+    "title": "Bandit Tickets",
+    "description": "Benvido á plataforma de venda de entradas"
+  }
+}

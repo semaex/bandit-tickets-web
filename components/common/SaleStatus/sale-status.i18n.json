@@ -1,0 +1,38 @@
+{
+  "en-GB": {
+    "on_sale": "Tickets on sale",
+    "coming_soon": "Coming soon",
+    "closed": "Sales closed",
+    "opening": "Opening:",
+    "closing": "Sales closing:"
+  },
+  "es-ES": {
+    "on_sale": "Entradas a la venta",
+    "coming_soon": "Próximamente",
+    "closed": "Ventas cerradas",
+    "opening": "Apertura:",
+    "closing": "Cierre de ventas:"
+  },
+  "ca-ES": {
+    "on_sale": "Entrades a la venda",
+    "coming_soon": "Pròximament",
+    "closed": "Vendes tancades",
+    "opening": "Obertura:",
+    "closing": "Tancament de vendes:"
+  },
+  "eu-ES": {
+    "on_sale": "Sarrerak salgai",
+    "coming_soon": "Laster",
+    "closed": "Salmentak itxita",
+    "opening": "Irekiera:",
+    "closing": "Salmenten itxiera:"
+  },
+  "gl-ES": {
+    "on_sale": "Entradas á venda",
+    "coming_soon": "Próximamente",
+    "closed": "Vendas pechadas",
+    "opening": "Apertura:",
+    "closing": "Pechamento de vendas:"
+  }
+}
+
