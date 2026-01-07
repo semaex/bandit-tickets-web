@@ -1,18 +1,23 @@
 {
   "en-GB": {
-    "organized_by": "Organized by"
+    "organized_by": "Organized by",
+    "view_on_google_maps": "View on Google Maps"
   },
   "es-ES": {
-    "organized_by": "Organizado por"
+    "organized_by": "Organizado por",
+    "view_on_google_maps": "Ver en Google Maps"
   },
   "ca-ES": {
-    "organized_by": "Organitzat per"
+    "organized_by": "Organitzat per",
+    "view_on_google_maps": "Veure a Google Maps"
   },
   "eu-ES": {
-    "organized_by": "Antolatzailea"
+    "organized_by": "Antolatzailea",
+    "view_on_google_maps": "Ikusi Google Maps-en"
   },
   "gl-ES": {
-    "organized_by": "Organizado por"
+    "organized_by": "Organizado por",
+    "view_on_google_maps": "Ver en Google Maps"
   }
 }
 

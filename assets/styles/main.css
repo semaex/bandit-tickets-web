@@ -6,10 +6,10 @@
 
 :root {
   /* Colors */
-  --color-primary: rgb(243, 67, 22);
-  --color-primary-hover: rgb(220, 60, 20);
-  --color-primary-light: rgba(243, 67, 22, 0.1);
-  --color-primary-light-20: rgba(243, 67, 22, 0.2);
+  --color-primary: rgb(62, 157, 215);
+  --color-primary-hover: rgb(50, 140, 195);
+  --color-primary-light: rgba(62, 157, 215, 0.1);
+  --color-primary-light-20: rgba(62, 157, 215, 0.2);
   
   --color-foreground: #1a1a1a;
   --color-muted-foreground: #6b7280;
@@ -52,6 +52,9 @@
 
   /* Gradients */
   --gradient-subtle: linear-gradient(180deg, hsl(220 25% 98%) 0%, hsl(220 20% 96%) 50%, hsl(220 15% 94%) 100%);
+  --gradient-page: radial-gradient(ellipse at right, #f7619714 40%, #08d2f10d, transparent);
+  --gradient-accent: linear-gradient(134deg, #7181db, #4be0e7);
+  --shadow-glow: 0 0 30px hsl(199 67% 54% / .3);
 }
 
 body {
@@ -59,6 +62,8 @@ body {
   line-height: 1.6;
   color: var(--color-foreground);
   background-color: var(--color-background);
+  background-image: var(--gradient-page);
+  min-height: 100vh;
 }
 
 /* Utility classes */

@@ -1,13 +1,24 @@
 <template>
-  <span class="GenreChip">{{ genre }}</span>
+  <span class="GenreChip">{{ translatedGenre }}</span>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useAppLanguage } from '../../../composables/useAppLanguage'
+
+const { trans } = useAppLanguage()
+
 interface Props {
   genre: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const translatedGenre = computed(() => {
+  const genreKey = props.genre.toLowerCase().replace(/\s+/g, '_')
+  const translation = trans(`musicGenres.${genreKey}`)
+  return translation !== `musicGenres.${genreKey}` ? translation : props.genre
+})
 </script>
 
 <style lang="scss">

@@ -1,4 +1,5 @@
-import { translations as defaultTranslations } from '../i18n/translations'
+import generalTranslations from '../i18n/general.i18n.json'
+import musicGenresTranslations from '../i18n/music-genres.i18n.json'
 import { appLanguages } from '../i18n/languages'
 
 interface Translations {
@@ -14,7 +15,9 @@ class TranslationService {
   private translations: Translations
 
   constructor() {
-    this.translations = defaultTranslations
+    this.translations = {}
+    this.addTranslations('general', generalTranslations)
+    this.addTranslations('musicGenres', musicGenresTranslations)
   }
 
   /**
@@ -109,7 +112,7 @@ class TranslationService {
     appLanguages.forEach((language) => {
       languages.push({
         code: language,
-        name: this.translate('language.' + language, undefined, currentLanguage)
+        name: this.translate('general.language.' + language, undefined, currentLanguage)
       })
     })
 

@@ -1,5 +1,6 @@
 {
   "en-GB": {
+    "organizer_to_confirm": "Organizer to be confirmed",
     "select_tickets": "Select your tickets",
     "genres": "Genres",
     "about_event": "About the event",
@@ -14,9 +15,11 @@
     "select_tickets_button_mobile": "Select tickets",
     "ticket": "ticket",
     "tickets": "tickets",
-    "from": "From"
+    "from": "From",
+    "venue_to_confirm": "Venue to be confirmed"
   },
   "es-ES": {
+    "organizer_to_confirm": "Organizador por confirmar",
     "select_tickets": "Selecciona tus entradas",
     "genres": "Géneros",
     "about_event": "Sobre el evento",
@@ -31,9 +34,11 @@
     "select_tickets_button_mobile": "Selecciona entradas",
     "ticket": "entrada",
     "tickets": "entradas",
-    "from": "Desde"
+    "from": "Desde",
+    "venue_to_confirm": "Venue por confirmar"
   },
   "ca-ES": {
+    "organizer_to_confirm": "Organitzador per confirmar",
     "select_tickets": "Selecciona les teves entrades",
     "genres": "Gèneres",
     "about_event": "Sobre l'esdeveniment",
@@ -48,9 +53,11 @@
     "select_tickets_button_mobile": "Selecciona entrades",
     "ticket": "entrada",
     "tickets": "entrades",
-    "from": "Des de"
+    "from": "Des de",
+    "venue_to_confirm": "Venue per confirmar"
   },
   "eu-ES": {
+    "organizer_to_confirm": "Antolatzailea berresteko",
     "select_tickets": "Aukeratu zure sarrerak",
     "genres": "Generoak",
     "about_event": "Ekitaldiari buruz",
@@ -65,9 +72,11 @@
     "select_tickets_button_mobile": "Aukeratu sarrerak",
     "ticket": "sarrera",
     "tickets": "sarrerak",
-    "from": "Hasieratik"
+    "from": "Hasieratik",
+    "venue_to_confirm": "Venue berresteko"
   },
   "gl-ES": {
+    "organizer_to_confirm": "Organizador por confirmar",
     "select_tickets": "Selecciona as túas entradas",
     "genres": "Xéneros",
     "about_event": "Sobre o evento",
@@ -82,6 +91,7 @@
     "select_tickets_button_mobile": "Selecciona entradas",
     "ticket": "entrada",
     "tickets": "entradas",
-    "from": "Desde"
+    "from": "Desde",
+    "venue_to_confirm": "Venue por confirmar"
   }
 }

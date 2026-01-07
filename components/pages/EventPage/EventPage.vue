@@ -1,6 +1,22 @@
 <template>
   <MicrositeLayout>
     <div class="EventPage">
+      <!-- Loading State -->
+      <div v-if="loading" class="EventPage-loading">
+        <div class="container">
+          <p>{{ trans('eventPage.loading') || 'Cargando evento...' }}</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="EventPage-error">
+        <div class="container">
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Event Content -->
+      <template v-else>
       <!-- Hero Section -->
       <section class="EventPage-hero">
         <div class="container">
@@ -34,6 +50,8 @@
                   :time="eventData.time"
                   :venue="eventData.venue"
                   :city="eventData.city"
+                  :venue-address="eventData.venueAddress"
+                  :venue-google-maps-url="eventData.venueGoogleMapsUrl"
                   :promoter="eventData.promoter"
                 />
               </div>
@@ -52,6 +70,8 @@
               :time="eventData.time"
               :venue="eventData.venue"
               :city="eventData.city"
+              :venue-address="eventData.venueAddress"
+              :venue-google-maps-url="eventData.venueGoogleMapsUrl"
               :promoter="eventData.promoter"
             />
           </section>
@@ -155,13 +175,14 @@
                   <span class="EventPage-summary-total-value">{{ totalPrice.toFixed(2) }} €</span>
                 </div>
 
-                <button
-                  class="EventPage-cta-button"
+                <ButtonCustom
+                  type="primary"
                   :disabled="totalTickets === 0"
+                  :full-width="true"
                   @click="handleCtaClick"
                 >
                   {{ totalTickets > 0 ? trans('eventPage.continue_to_payment') : trans('eventPage.select_tickets_button') }}
-                </button>
+                </ButtonCustom>
               </div>
             </aside>
           </div>
@@ -186,19 +207,20 @@
                 {{ trans('eventPage.from') }} {{ minPrice.toFixed(2) }} €
               </p>
             </div>
-            <button
-              class="EventPage-mobile-cta-button"
+            <ButtonCustom
+              type="primary"
               :disabled="totalTickets === 0"
               @click="handleCtaClick"
             >
               {{ totalTickets > 0 ? trans('eventPage.continue_to_payment') : trans('eventPage.select_tickets_button_mobile') }}
-            </button>
+            </ButtonCustom>
           </div>
         </div>
       </div>
 
       <!-- Footer spacer for mobile CTA -->
       <div v-if="isOnSale" class="EventPage-mobile-spacer"></div>
+      </template>
     </div>
   </MicrositeLayout>
 </template>
@@ -211,16 +233,28 @@ import EventInfo from '../../common/EventInfo/EventInfo.vue'
 import SaleStatus from '../../common/SaleStatus/SaleStatus.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
 import GenreChip from '../../common/GenreChip/GenreChip.vue'
+import ButtonCustom from '../../ui/ButtonCustom.vue'
 import { useCheckout } from '../../../composables/useCheckout'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
+import { findEventBySlug } from '../../../model/Event/Event.services'
+import type { Event as EventModel } from '../../../model/Event/Event'
+import { findVenueById } from '../../../model/Venue/Venue.services'
+import { findPromoterProfileById } from '../../../model/PromoterProfile/PromoterProfile.services'
+import { findTicketTypesByEvent } from '../../../model/TicketType/TicketType.services'
+import { StringMultilanguage } from '../../../model/Shared/StringMultilanguage'
+import { Locale } from '../../../model/Shared/Locale'
 import eventPageTranslations from './event-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
+
+const props = defineProps<{
+  slug: string
+}>()
 
 // Load translations
 translationService.addTranslations('eventPage', eventPageTranslations)
 
 // Use translation composable
-const { trans } = useAppLanguage()
+const { trans, appLanguage } = useAppLanguage()
 
 interface Ticket {
   id: string
@@ -237,6 +271,8 @@ interface EventData {
   time: string
   venue: string
   city: string
+  venueAddress?: string
+  venueGoogleMapsUrl?: string
   promoter: string
   saleStatus: 'on-sale' | 'coming-soon' | 'closed'
   closeDate?: string
@@ -247,65 +283,197 @@ interface EventData {
   image?: string
 }
 
-// Mock event data - in production this would come from an API
-const eventData: EventData = {
-  title: 'AURORA WORLD TOUR',
-  subtitle: "Presentando su nuevo álbum 'The Gods We Can Touch'",
-  date: 'Sábado, 15 de Marzo 2025',
-  time: '21:00h (Apertura de puertas: 19:30h)',
-  venue: 'Wizink Center',
-  city: 'Madrid',
-  promoter: 'Live Nation España',
-  saleStatus: 'on-sale',
-  closeDate: '15 de Marzo 2025, 18:00h',
-  genres: ['Indie Pop', 'Art Pop', 'Electronic', 'Folk'],
-  description: `Después de conquistar escenarios en todo el mundo, AURORA regresa a España con su esperada gira mundial. La artista noruega, conocida por su voz etérea y sus espectáculos visuales únicos, presentará los temas de su aclamado álbum "The Gods We Can Touch" junto a sus éxitos más emblemáticos.
+const loading = ref(true)
+const error = ref<string | null>(null)
+const eventData = ref<EventData>({
+  title: '',
+  date: '',
+  time: '',
+  venue: '',
+  city: '',
+  promoter: '',
+  saleStatus: 'coming-soon',
+  genres: [],
+  description: '',
+  conditions: '',
+  tickets: []
+})
 
-Este concierto promete ser una experiencia inmersiva donde la música, el arte visual y la conexión emocional se fusionan en un espectáculo inolvidable. AURORA ha cautivado a millones de fans con canciones como "Runaway", "Cure for Me" y "Exist for Love", consolidándose como una de las artistas más originales de su generación.
-
-No te pierdas la oportunidad de vivir en directo la magia de AURORA en una noche que promete ser verdaderamente especial.`,
-  tickets: [
-    {
-      id: 'general',
-      name: 'Entrada General',
-      description: 'Acceso a la zona de pista',
-      price: 45.0,
-      available: true
-    },
-    {
-      id: 'vip',
-      name: 'VIP Experience',
-      description: 'Acceso preferente + zona VIP + merchandising exclusivo',
-      price: 120.0,
-      available: true
-    },
-    {
-      id: 'meet',
-      name: 'Meet & Greet',
-      description: 'Incluye VIP + foto con el artista + soundcheck',
-      price: 250.0,
-      available: false
-    }
-  ],
-  conditions: `Al adquirir tu entrada aceptas los términos y condiciones del evento. Las entradas son nominativas e intransferibles. Se requiere documento de identidad para el acceso. No se permiten cámaras profesionales ni grabación de video. El organizador se reserva el derecho de admisión. En caso de cancelación, se procederá al reembolso según la política vigente. Menores de 16 años deben ir acompañados de un adulto. Prohibida la reventa.`
+const getLocalizedText = (text: StringMultilanguage | null, fallback: string = ''): string => {
+  if (!text || text.isEmpty()) return fallback
+  
+  const currentLocale = Locale.fromString(appLanguage.value)
+  const fallbackLocale = Locale.fromString('es-ES')
+  
+  return text.valueWithFallback(currentLocale, fallbackLocale) || fallback
 }
+
+const formatDate = (date: Date | null): string => {
+  if (!date) return ''
+  try {
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  } catch {
+    return ''
+  }
+}
+
+const formatTime = (time: import('../../../model/Shared/Time').Time | null): string => {
+  if (!time) return ''
+  return time.toShortString() + 'h'
+}
+
+const formatDates = (dates: Date[]): string => {
+  if (!dates || dates.length === 0) return ''
+  if (dates.length === 1) return formatDate(dates[0])
+  return [dates[0], dates[1]].map((d) => formatDate(d)).filter(Boolean).join(' · ')
+}
+
+
+const loadEvent = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const event = await findEventBySlug(props.slug)
+    
+    const venueName = trans('eventPage.venue_to_confirm')
+    const venueCity = event.countryCode ? event.countryCode.toString() : ''
+    const organizerName = event.promoterProfileId 
+      ? trans('eventPage.organizer_to_confirm')
+      : event.promoterId.toString()
+    
+    eventData.value = {
+      title: getLocalizedText(event.title, 'Evento sin título'),
+      subtitle: getLocalizedText(event.subtitle),
+      date: formatDates(event.dates),
+      time: event.startTime 
+        ? `${formatTime(event.startTime)}${event.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.doorsOpenTime)})` : ''}`
+        : '',
+      venue: venueName,
+      city: venueCity,
+      venueAddress: undefined,
+      venueGoogleMapsUrl: undefined,
+      promoter: organizerName,
+      saleStatus: event.saleStatus,
+      closeDate: event.ticketSaleClosesAt ? formatDate(event.ticketSaleClosesAt) : undefined,
+      genres: event.musicGenres || [],
+      description: getLocalizedText(event.description, ''),
+      conditions: getLocalizedText(event.terms, ''),
+      tickets: [],
+      image: event.imageUrl ? event.imageUrl.toString() : undefined
+    }
+    
+    loading.value = false
+    
+    loadVenueAndOrganizer(event)
+    loadTicketTypes(event.id.toString())
+    
+    const initialQuantities: Record<string, number> = {}
+    eventData.value.tickets.forEach(ticket => {
+      initialQuantities[ticket.id] = 0
+    })
+    quantities.value = initialQuantities
+  } catch (err) {
+    error.value = 'Error al cargar el evento'
+    console.error('Error loading event:', err)
+    loading.value = false
+  }
+}
+
+const loadVenueAndOrganizer = async (event: EventModel) => {
+  const promises: Promise<void>[] = []
+  
+  if (event.venueId) {
+    promises.push(
+      findVenueById(event.venueId.toString())
+        .then((venue) => {
+          const venueGoogleMapsUrl = venue.coords 
+            ? `https://www.google.com/maps?q=${venue.coords.latitude()},${venue.coords.longitude()}`
+            : undefined
+          
+          eventData.value = {
+            ...eventData.value,
+            venue: venue.name,
+            city: venue.city || (venue.countryCode ? venue.countryCode.toString() : eventData.value.city),
+            venueAddress: venue.address || undefined,
+            venueGoogleMapsUrl: venueGoogleMapsUrl
+          }
+        })
+        .catch((venueErr) => {
+          console.warn('Error loading venue:', venueErr)
+        })
+    )
+  }
+
+  if (event.promoterProfileId) {
+    promises.push(
+      findPromoterProfileById(event.promoterProfileId.toString())
+        .then((profile) => {
+          eventData.value = {
+            ...eventData.value,
+            promoter: profile.brandName
+          }
+        })
+        .catch((profileErr) => {
+          console.warn('Error loading promoter profile:', profileErr)
+        })
+    )
+  }
+  
+  await Promise.all(promises)
+}
+
+const loadTicketTypes = async (eventId: string) => {
+  try {
+    const ticketTypes = await findTicketTypesByEvent(eventId)
+    
+    const currentLocale = Locale.fromString(appLanguage.value)
+    const fallbackLocale = Locale.fromString('es-ES')
+    
+    eventData.value = {
+      ...eventData.value,
+      tickets: ticketTypes
+        .filter(tt => tt.isPublished)
+        .map(tt => ({
+          id: tt.id.toString(),
+          name: getLocalizedText(tt.name, 'Entrada sin nombre'),
+          description: getLocalizedText(tt.description, ''),
+          price: tt.price ? tt.price.amount() : 0,
+          available: tt.available
+        }))
+    }
+    
+    const initialQuantities: Record<string, number> = {}
+    eventData.value.tickets.forEach(ticket => {
+      initialQuantities[ticket.id] = 0
+    })
+    quantities.value = initialQuantities
+  } catch (err) {
+    console.warn('Error loading ticket types:', err)
+  }
+}
+
+onMounted(() => {
+  loadEvent()
+})
 
 const router = useRouter()
 const ticketSectionRef = ref<HTMLElement | null>(null)
 const ticketsVisible = ref(true)
 
-const quantities = ref<Record<string, number>>({
-  general: 0,
-  vip: 0,
-  meet: 0
-})
+const quantities = ref<Record<string, number>>({})
 
 const totalTickets = computed(() => {
   return Object.values(quantities.value).reduce((a, b) => a + b, 0)
 })
 
 const subtotal = computed(() => {
-  return eventData.tickets.reduce((total, ticket) => {
+  return eventData.value.tickets.reduce((total: number, ticket) => {
     return total + ticket.price * (quantities.value[ticket.id] || 0)
   }, 0)
 })
@@ -319,19 +487,20 @@ const totalPrice = computed(() => {
 })
 
 const selectedTickets = computed(() => {
-  return eventData.tickets.filter((ticket) => quantities.value[ticket.id] > 0)
+  return eventData.value.tickets.filter((ticket) => quantities.value[ticket.id] > 0)
 })
 
 const isOnSale = computed(() => {
-  return eventData.saleStatus === 'on-sale'
+  return eventData.value.saleStatus === 'on-sale'
 })
 
 const minPrice = computed(() => {
-  return Math.min(...eventData.tickets.map((t) => t.price))
+  if (eventData.value.tickets.length === 0) return 0
+  return Math.min(...eventData.value.tickets.map((t) => t.price))
 })
 
 const descriptionParagraphs = computed(() => {
-  return eventData.description.split('\n\n').filter((p) => p.trim())
+  return eventData.value.description.split('\n\n').filter((p) => p.trim())
 })
 
 const handleQuantityChange = (ticketId: string, quantity: number) => {
@@ -358,9 +527,9 @@ const handleCtaClick = () => {
       subtotal: subtotal.value,
       serviceFee: serviceFee.value,
       total: totalPrice.value,
-      eventTitle: eventData.title,
-      eventDate: eventData.date,
-      eventVenue: `${eventData.venue}, ${eventData.city}`
+      eventTitle: eventData.value.title,
+      eventDate: eventData.value.date,
+      eventVenue: `${eventData.value.venue}, ${eventData.value.city}`
     })
     router.push('/checkout')
   }
@@ -642,28 +811,6 @@ onUnmounted(() => {
     color: var(--color-foreground);
   }
 
-  &-cta-button {
-    width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color var(--transition-base);
-
-    &:hover:not(:disabled) {
-      background-color: var(--color-primary-hover);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
   &-mobile-cta {
     display: block;
     position: fixed;
@@ -712,33 +859,36 @@ onUnmounted(() => {
     margin: 0;
   }
 
-  &-mobile-cta-button {
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color var(--transition-base);
-    white-space: nowrap;
-
-    &:hover:not(:disabled) {
-      background-color: var(--color-primary-hover);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
   &-mobile-spacer {
     height: 96px;
 
     @media (min-width: 1024px) {
       display: none;
+    }
+  }
+
+  &-loading,
+  &-error {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+  }
+
+  &-loading {
+    p {
+      color: var(--color-muted-foreground);
+      font-size: 1.125rem;
+    }
+  }
+
+  &-error {
+    p {
+      color: var(--color-error, #ef4444);
+      font-size: 1.125rem;
+      font-weight: 500;
     }
   }
 }
