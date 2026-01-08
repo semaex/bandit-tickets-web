@@ -1,5 +1,18 @@
 import { Locale } from './Locale'
 
+// Locale fallback mapping: source locale -> destination locale
+const LOCALE_FALLBACK_MAP: Record<string, string> = {
+  // Regional languages of Spain fall back to Spanish
+  'ca-ES': 'es-ES', // Catalan
+  'eu-ES': 'es-ES', // Basque
+  'gl-ES': 'es-ES', // Galician
+}
+
+// Pattern-based fallbacks (language-X -> language-ES)
+const shouldFallbackToSpanishVariant = (language: string, country: string): boolean => {
+  return country !== 'ES' && ['es', 'ca', 'eu', 'gl'].includes(language)
+}
+
 export class StringMultilanguage {
   private readonly values: Record<string, string>
 
@@ -23,19 +36,60 @@ export class StringMultilanguage {
     return this.values[localeValue] ?? null
   }
 
-  valueWithFallback(locale: Locale, fallbackLocale: Locale | null = null): string | null {
+  valueForLocaleOrAutoFallback(locale: Locale): string | null {
+    // 1. Try exact locale
     const value = this.value(locale)
     if (value !== null && value !== '') {
       return value
     }
 
-    if (fallbackLocale !== null) {
-      const fallbackValue = this.value(fallbackLocale)
-      if (fallbackValue !== null && fallbackValue !== '') {
-        return fallbackValue
+    // 2. Try explicit fallback from mapping
+    const localeString = locale.toString()
+    const mappedFallback = LOCALE_FALLBACK_MAP[localeString]
+    if (mappedFallback) {
+      try {
+        const fallbackLocale = Locale.fromString(mappedFallback)
+        const fallbackValue = this.value(fallbackLocale)
+        if (fallbackValue !== null && fallbackValue !== '') {
+          return fallbackValue
+        }
+      } catch {
+        // Ignore invalid mapped locale
       }
     }
 
+    // 3. Try pattern-based fallback (e.g., es-AR -> es-ES)
+    const parts = localeString.split('-')
+    if (parts.length === 2) {
+      const [language, country] = parts
+      
+      if (shouldFallbackToSpanishVariant(language, country)) {
+        try {
+          const spanishLocale = Locale.fromString(`${language}-ES`)
+          const spanishValue = this.value(spanishLocale)
+          if (spanishValue !== null && spanishValue !== '') {
+            return spanishValue
+          }
+        } catch {
+          // Ignore invalid locale
+        }
+      }
+    }
+
+    // 4. Try es-ES as ultimate fallback (project default language)
+    if (localeString !== 'es-ES') {
+      try {
+        const defaultLocale = Locale.fromString('es-ES')
+        const defaultValue = this.value(defaultLocale)
+        if (defaultValue !== null && defaultValue !== '') {
+          return defaultValue
+        }
+      } catch {
+        // Ignore invalid locale
+      }
+    }
+
+    // 5. Try any available locale as last resort
     const availableLocales = Object.keys(this.values)
     for (const availableLocale of availableLocales) {
       try {

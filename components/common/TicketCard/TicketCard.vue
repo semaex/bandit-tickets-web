@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
+import { Money } from '../../../model/Shared/Money'
 import ticketCardTranslations from './ticket-card.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
@@ -52,7 +53,7 @@ const { trans } = useAppLanguage()
 interface Props {
   name: string
   description?: string
-  price: number
+  price: Money
   quantity: number
   maxQuantity?: number
   available: boolean
@@ -67,7 +68,7 @@ const emit = defineEmits<{
 }>()
 
 const formattedPrice = computed(() => {
-  return `${props.price.toFixed(2)} €`
+  return props.price.formatted()
 })
 
 const handleDecrease = () => {

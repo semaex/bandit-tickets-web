@@ -52,7 +52,6 @@
 
   /* Gradients */
   --gradient-subtle: linear-gradient(180deg, hsl(220 25% 98%) 0%, hsl(220 20% 96%) 50%, hsl(220 15% 94%) 100%);
-  --gradient-page: radial-gradient(ellipse at right, #f7619714 40%, #08d2f10d, transparent);
   --gradient-accent: linear-gradient(134deg, #7181db, #4be0e7);
   --shadow-glow: 0 0 30px hsl(199 67% 54% / .3);
 }
@@ -62,7 +61,7 @@ body {
   line-height: 1.6;
   color: var(--color-foreground);
   background-color: var(--color-background);
-  background-image: var(--gradient-page);
+  background: var(--gradient-subtle);
   min-height: 100vh;
 }
 

@@ -4,7 +4,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="EventPage-loading">
         <div class="container">
-          <p>{{ trans('eventPage.loading') || 'Cargando evento...' }}</p>
+          <p>{{ trans('eventPage.loading') }}</p>
         </div>
       </div>
 
@@ -16,17 +16,47 @@
       </div>
 
       <!-- Event Content -->
-      <template v-else>
-      <!-- Hero Section -->
-      <section class="EventPage-hero">
+      <template v-else-if="event!==null">
+      <!-- Hero Section - Full Width (if image exists) -->
+      <section v-if="hasHeroImage" class="EventPage-hero-full">
+        <div class="EventPage-hero-image-wrapper">
+          <img
+            :src="eventImageUrl"
+            :alt="event.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
+            class="EventPage-hero-image"
+          />
+        </div>
+        <div class="container">
+          <h1 class="EventPage-hero-title">{{ event?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
+          <p v-if="event?.subtitle && !event.subtitle.isEmpty() && event.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-hero-subtitle">
+            {{ event.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
+          </p>
+          
+          <!-- Quick Info - Desktop -->
+          <div class="EventPage-hero-info-desktop">
+            <EventInfo
+              :date="eventDate"
+              :time="eventTime"
+              :venue="eventVenue"
+              :city="eventCity"
+              :venue-address="eventVenueAddress"
+              :venue-google-maps-url="eventVenueGoogleMapsUrl"
+              :promoter="eventPromoter"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Hero Section - Regular Layout (if no image) -->
+      <section v-else class="EventPage-hero">
         <div class="container">
           <div class="EventPage-hero-content">
             <!-- Event Image -->
             <div class="EventPage-image-wrapper">
               <div class="EventPage-image-container">
                 <img
-                  :src="eventData.image || '/placeholder-event.jpg'"
-                  :alt="eventData.title"
+                  :src="eventImageUrl || '/placeholder-event.jpg'"
+                  :alt="event?.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
                   class="EventPage-image"
                 />
               </div>
@@ -35,24 +65,25 @@
             <!-- Event Header Info -->
             <div class="EventPage-header">
               <SaleStatus
-                :status="eventData.saleStatus"
-                :close-date="eventData.closeDate"
+                v-if="event"
+                :status="event.saleStatus"
+                :close-date="eventTicketSaleClosesAt"
               />
-              <h1 class="EventPage-title">{{ eventData.title }}</h1>
-              <p v-if="eventData.subtitle" class="EventPage-subtitle">
-                {{ eventData.subtitle }}
+              <h1 class="EventPage-title">{{ event?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
+              <p v-if="event?.subtitle && !event.subtitle.isEmpty() && event.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-subtitle">
+                {{ event.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
               </p>
               
               <!-- Quick Info - Desktop -->
               <div class="EventPage-info-desktop">
                 <EventInfo
-                  :date="eventData.date"
-                  :time="eventData.time"
-                  :venue="eventData.venue"
-                  :city="eventData.city"
-                  :venue-address="eventData.venueAddress"
-                  :venue-google-maps-url="eventData.venueGoogleMapsUrl"
-                  :promoter="eventData.promoter"
+                  :date="eventDate"
+                  :time="eventTime"
+                  :venue="eventVenue"
+                  :city="eventCity"
+                  :venue-address="eventVenueAddress"
+                  :venue-google-maps-url="eventVenueGoogleMapsUrl"
+                  :promoter="eventPromoter"
                 />
               </div>
             </div>
@@ -63,16 +94,16 @@
       <!-- Main Content -->
       <main class="EventPage-main">
         <div class="container">
-          <!-- Event Info - Mobile only -->
-          <section class="EventPage-info-mobile">
+          <!-- Event Info - Mobile only OR after hero image -->
+          <section :class="hasHeroImage ? 'EventPage-info-after-hero' : 'EventPage-info-mobile'">
             <EventInfo
-              :date="eventData.date"
-              :time="eventData.time"
-              :venue="eventData.venue"
-              :city="eventData.city"
-              :venue-address="eventData.venueAddress"
-              :venue-google-maps-url="eventData.venueGoogleMapsUrl"
-              :promoter="eventData.promoter"
+              :date="eventDate"
+              :time="eventTime"
+              :venue="eventVenue"
+              :city="eventCity"
+              :venue-address="eventVenueAddress"
+              :venue-google-maps-url="eventVenueGoogleMapsUrl"
+              :promoter="eventPromoter"
             />
           </section>
 
@@ -89,14 +120,14 @@
                 <h2 class="EventPage-section-title">{{ trans('eventPage.select_tickets') }}</h2>
                 <div class="EventPage-tickets-list">
                   <TicketCard
-                    v-for="ticket in eventData.tickets"
-                    :key="ticket.id"
-                    :name="ticket.name"
-                    :description="ticket.description"
-                    :price="ticket.price"
-                    :quantity="quantities[ticket.id] || 0"
-                    :available="ticket.available"
-                    @quantity-change="(qty: number) => handleQuantityChange(ticket.id, qty)"
+                    v-for="ticketType in publishedTicketTypes"
+                    :key="ticketType.id.toString()"
+                    :name="getTicketName(ticketType)"
+                    :description="getTicketDescription(ticketType)"
+                    :price="ticketType.price!"
+                    :quantity="quantities[ticketType.id.toString()] || 0"
+                    :available="ticketType.available"
+                    @quantity-change="(qty: number) => handleQuantityChange(ticketType.id.toString(), qty)"
                   />
                 </div>
               </section>
@@ -108,7 +139,7 @@
                   <h2 class="EventPage-section-title">{{ trans('eventPage.genres') }}</h2>
                   <div class="EventPage-genres">
                     <GenreChip
-                      v-for="genre in eventData.genres"
+                      v-for="genre in eventMusicGenres"
                       :key="genre"
                       :genre="genre"
                     />
@@ -129,12 +160,38 @@
                   </div>
                 </section>
 
+                <!-- Minors Policy -->
+                <section
+                  v-if="eventHasMinorsPolicy"
+                  class="EventPage-section"
+                >
+                  <h2 class="EventPage-section-title">{{ trans('eventPage.minors_policy') }}</h2>
+                  <div class="EventPage-description">
+                    <p
+                      v-for="(paragraph, index) in minorsPolicyParagraphs"
+                      :key="index"
+                      class="EventPage-description-paragraph"
+                    >
+                      {{ paragraph }}
+                    </p>
+                  </div>
+                  <div v-if="minorsPolicyFile" class="EventPage-file-download">
+                    <a
+                      :href="minorsPolicyFile.url.toString()"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="EventPage-file-link"
+                    >
+                      <Icon name="download" size="sm" class="EventPage-file-link-icon" />
+                      {{ trans('eventPage.download_authorization_file') }}
+                    </a>
+                  </div>
+                </section>
+
                 <!-- Conditions -->
                 <section class="EventPage-section EventPage-section--bordered">
                   <h2 class="EventPage-section-title">{{ trans('eventPage.conditions') }}</h2>
-                  <p class="EventPage-conditions">
-                    {{ eventData.conditions }}
-                  </p>
+                  <p class="EventPage-conditions" v-html="formattedTerms"></p>
                 </section>
               </div>
             </div>
@@ -144,26 +201,26 @@
               <div class="EventPage-summary-card">
                 <h3 class="EventPage-summary-title">{{ trans('eventPage.purchase_summary') }}</h3>
                 
-                <div v-if="selectedTickets.length > 0" class="EventPage-summary-items">
+                <div v-if="selectedTicketTypes.length > 0" class="EventPage-summary-items">
                   <div
-                    v-for="ticket in selectedTickets"
-                    :key="ticket.id"
+                    v-for="ticketType in selectedTicketTypes"
+                    :key="ticketType.id.toString()"
                     class="EventPage-summary-item"
                   >
                     <span class="EventPage-summary-item-name">
-                      {{ quantities[ticket.id] }}x {{ ticket.name }}
+                      {{ quantities[ticketType.id.toString()] }}x {{ getTicketName(ticketType) }}
                     </span>
                     <span class="EventPage-summary-item-price">
-                      {{ (ticket.price * quantities[ticket.id]).toFixed(2) }} €
+                      {{ ticketType.price!.multiply(quantities[ticketType.id.toString()]).formatted() }}
                     </span>
                   </div>
                   <div class="EventPage-summary-line">
                     <span class="EventPage-summary-label">{{ trans('eventPage.subtotal') }}</span>
-                    <span class="EventPage-summary-value">{{ subtotal.toFixed(2) }} €</span>
+                    <span class="EventPage-summary-value">{{ subtotal.formatted() }}</span>
                   </div>
                   <div class="EventPage-summary-line">
                     <span class="EventPage-summary-label">{{ trans('eventPage.service_fee') }}</span>
-                    <span class="EventPage-summary-value">{{ serviceFee.toFixed(2) }} €</span>
+                    <span class="EventPage-summary-value">{{ serviceFee.formatted() }}</span>
                   </div>
                 </div>
                 <p v-else class="EventPage-summary-empty">
@@ -172,7 +229,7 @@
 
                 <div class="EventPage-summary-total">
                   <span class="EventPage-summary-total-label">{{ trans('eventPage.total') }}</span>
-                  <span class="EventPage-summary-total-value">{{ totalPrice.toFixed(2) }} €</span>
+                  <span class="EventPage-summary-total-value">{{ totalPrice.formatted() }}</span>
                 </div>
 
                 <ButtonCustom
@@ -201,10 +258,10 @@
                 v-if="totalTickets > 0"
                 class="EventPage-mobile-cta-price"
               >
-                {{ totalPrice.toFixed(2) }} €
+                {{ totalPrice.formatted() }}
               </p>
               <p v-else class="EventPage-mobile-cta-from">
-                {{ trans('eventPage.from') }} {{ minPrice.toFixed(2) }} €
+                {{ trans('eventPage.from') }} {{ minPrice.formatted() }}
               </p>
             </div>
             <ButtonCustom
@@ -233,7 +290,8 @@ import EventInfo from '../../common/EventInfo/EventInfo.vue'
 import SaleStatus from '../../common/SaleStatus/SaleStatus.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
 import GenreChip from '../../common/GenreChip/GenreChip.vue'
-import ButtonCustom from '../../ui/ButtonCustom.vue'
+import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
+import Icon from '../../ui/icon/Icon.vue'
 import { useCheckout } from '../../../composables/useCheckout'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
 import { findEventBySlug } from '../../../model/Event/Event.services'
@@ -241,8 +299,15 @@ import type { Event as EventModel } from '../../../model/Event/Event'
 import { findVenueById } from '../../../model/Venue/Venue.services'
 import { findPromoterProfileById } from '../../../model/PromoterProfile/PromoterProfile.services'
 import { findTicketTypesByEvent } from '../../../model/TicketType/TicketType.services'
+import type { TicketType } from '../../../model/TicketType/TicketType'
+import { findFileById } from '../../../model/File/File.services'
+import type { File as FileModel } from '../../../model/File/File'
+import type { Venue } from '../../../model/Venue/Venue'
+import type { PromoterProfile } from '../../../model/PromoterProfile/PromoterProfile'
 import { StringMultilanguage } from '../../../model/Shared/StringMultilanguage'
 import { Locale } from '../../../model/Shared/Locale'
+import { Money } from '../../../model/Shared/Money'
+import { Currency } from '../../../model/Shared/Currency'
 import eventPageTranslations from './event-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
@@ -256,57 +321,95 @@ translationService.addTranslations('eventPage', eventPageTranslations)
 // Use translation composable
 const { trans, appLanguage } = useAppLanguage()
 
-interface Ticket {
-  id: string
-  name: string
-  description: string
-  price: number
-  available: boolean
-}
-
-interface EventData {
-  title: string
-  subtitle?: string
-  date: string
-  time: string
-  venue: string
-  city: string
-  venueAddress?: string
-  venueGoogleMapsUrl?: string
-  promoter: string
-  saleStatus: 'on-sale' | 'coming-soon' | 'closed'
-  closeDate?: string
-  genres: string[]
-  description: string
-  conditions: string
-  tickets: Ticket[]
-  image?: string
-}
-
 const loading = ref(true)
 const error = ref<string | null>(null)
-const eventData = ref<EventData>({
-  title: '',
-  date: '',
-  time: '',
-  venue: '',
-  city: '',
-  promoter: '',
-  saleStatus: 'coming-soon',
-  genres: [],
-  description: '',
-  conditions: '',
-  tickets: []
+const event = ref<EventModel | null>(null)
+const venue = ref<Venue | null>(null)
+const promoterProfile = ref<PromoterProfile | null>(null)
+const ticketTypes = ref<TicketType[]>([])
+const minorsPolicyFile = ref<FileModel | null>(null)
+const currency = ref<Currency>(Currency.EUR)
+
+const currentLocale = computed(() => Locale.fromString(appLanguage.value))
+
+const getTicketName = (ticket: TicketType): string => {
+  if (!ticket.name || ticket.name.isEmpty()) return ''
+  return ticket.name.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+}
+
+const getTicketDescription = (ticket: TicketType): string => {
+  if (!ticket.description || ticket.description.isEmpty()) return ''
+  return ticket.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+}
+
+const publishedTicketTypes = computed(() => {
+  return ticketTypes.value.filter(tt => tt.isPublished) as TicketType[]
 })
 
-const getLocalizedText = (text: StringMultilanguage | null, fallback: string = ''): string => {
-  if (!text || text.isEmpty()) return fallback
-  
-  const currentLocale = Locale.fromString(appLanguage.value)
-  const fallbackLocale = Locale.fromString('es-ES')
-  
-  return text.valueWithFallback(currentLocale, fallbackLocale) || fallback
-}
+
+const eventDate = computed(() => {
+  return event.value ? formatDates(event.value.dates) : ''
+})
+
+const eventTime = computed(() => {
+  if (!event.value) return ''
+  if (!event.value.startTime) return ''
+  const timeStr = formatTime(event.value.startTime as import('../../../model/Shared/Time').Time)
+  const doorsTime = event.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.value.doorsOpenTime as import('../../../model/Shared/Time').Time)})` : ''
+  return `${timeStr}${doorsTime}`
+})
+
+const eventVenue = computed(() => {
+  return venue.value?.name || trans('eventPage.venue_to_confirm')
+})
+
+const eventCity = computed(() => {
+  return venue.value?.city || (venue.value?.countryCode ? venue.value.countryCode.toString() : (event.value?.countryCode ? event.value.countryCode.toString() : ''))
+})
+
+const eventVenueAddress = computed(() => {
+  return venue.value?.address || undefined
+})
+
+const eventVenueGoogleMapsUrl = computed(() => {
+  if (!venue.value?.coords) return undefined
+  return `https://www.google.com/maps?q=${venue.value.coords.latitude()},${venue.value.coords.longitude()}`
+})
+
+const eventPromoter = computed(() => {
+  return promoterProfile.value?.brandName || (event.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : (event.value?.promoterId ? event.value.promoterId.toString() : ''))
+})
+
+const eventTicketSaleClosesAt = computed(() => {
+  return event.value?.ticketSaleClosesAt ? formatDate(event.value.ticketSaleClosesAt) : undefined
+})
+
+const eventMusicGenres = computed(() => {
+  return event.value?.musicGenres || []
+})
+
+const eventDescription = computed(() => {
+  if (!event.value || !event.value.description || event.value.description.isEmpty()) return ''
+  return event.value.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+})
+
+const eventTerms = computed(() => {
+  if (!event.value || !event.value.terms || event.value.terms.isEmpty()) return ''
+  return event.value.terms.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+})
+
+const eventImageUrl = computed(() => {
+  return event.value?.imageUrl ? event.value.imageUrl.toString() : undefined
+})
+
+const eventHasMinorsPolicy = computed(() => {
+  return event.value?.hasMinorsPolicy || false
+})
+
+const eventMinorsPolicyDescription = computed(() => {
+  if (!event.value || !event.value.minorsPolicyDescription || event.value.minorsPolicyDescription.isEmpty()) return ''
+  return event.value.minorsPolicyDescription.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+})
 
 const formatDate = (date: Date | null): string => {
   if (!date) return ''
@@ -327,6 +430,14 @@ const formatTime = (time: import('../../../model/Shared/Time').Time | null): str
   return time.toShortString() + 'h'
 }
 
+const formattedTerms = computed(() => {
+  return (eventTerms.value ?? '').replace(/\n/g, '<br />')
+})
+
+const hasHeroImage = computed(() => {
+  return !!eventImageUrl.value
+})
+
 const formatDates = (dates: Date[]): string => {
   if (!dates || dates.length === 0) return ''
   if (dates.length === 1) return formatDate(dates[0])
@@ -339,45 +450,23 @@ const loadEvent = async () => {
   error.value = null
   
   try {
-    const event = await findEventBySlug(props.slug)
+    const eventModel = await findEventBySlug(props.slug)
     
     const venueName = trans('eventPage.venue_to_confirm')
-    const venueCity = event.countryCode ? event.countryCode.toString() : ''
-    const organizerName = event.promoterProfileId 
+    const venueCity = eventModel.countryCode ? eventModel.countryCode.toString() : ''
+    const organizerName = eventModel.promoterProfileId 
       ? trans('eventPage.organizer_to_confirm')
-      : event.promoterId.toString()
+      : eventModel.promoterId.toString()
     
-    eventData.value = {
-      title: getLocalizedText(event.title, 'Evento sin título'),
-      subtitle: getLocalizedText(event.subtitle),
-      date: formatDates(event.dates),
-      time: event.startTime 
-        ? `${formatTime(event.startTime)}${event.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.doorsOpenTime)})` : ''}`
-        : '',
-      venue: venueName,
-      city: venueCity,
-      venueAddress: undefined,
-      venueGoogleMapsUrl: undefined,
-      promoter: organizerName,
-      saleStatus: event.saleStatus,
-      closeDate: event.ticketSaleClosesAt ? formatDate(event.ticketSaleClosesAt) : undefined,
-      genres: event.musicGenres || [],
-      description: getLocalizedText(event.description, ''),
-      conditions: getLocalizedText(event.terms, ''),
-      tickets: [],
-      image: event.imageUrl ? event.imageUrl.toString() : undefined
-    }
+    event.value = eventModel
     
     loading.value = false
     
-    loadVenueAndOrganizer(event)
-    loadTicketTypes(event.id.toString())
-    
-    const initialQuantities: Record<string, number> = {}
-    eventData.value.tickets.forEach(ticket => {
-      initialQuantities[ticket.id] = 0
-    })
-    quantities.value = initialQuantities
+    loadVenueAndOrganizer(eventModel)
+    loadTicketTypes(eventModel.id.toString())
+    if (eventModel.hasMinorsPolicy && eventModel.minorsPolicyAthorizationFileId) {
+      loadMinorsPolicyFile(eventModel.minorsPolicyAthorizationFileId.toString())
+    }
   } catch (err) {
     error.value = 'Error al cargar el evento'
     console.error('Error loading event:', err)
@@ -385,24 +474,14 @@ const loadEvent = async () => {
   }
 }
 
-const loadVenueAndOrganizer = async (event: EventModel) => {
+const loadVenueAndOrganizer = async (eventModel: EventModel) => {
   const promises: Promise<void>[] = []
   
-  if (event.venueId) {
+  if (eventModel.venueId) {
     promises.push(
-      findVenueById(event.venueId.toString())
-        .then((venue) => {
-          const venueGoogleMapsUrl = venue.coords 
-            ? `https://www.google.com/maps?q=${venue.coords.latitude()},${venue.coords.longitude()}`
-            : undefined
-          
-          eventData.value = {
-            ...eventData.value,
-            venue: venue.name,
-            city: venue.city || (venue.countryCode ? venue.countryCode.toString() : eventData.value.city),
-            venueAddress: venue.address || undefined,
-            venueGoogleMapsUrl: venueGoogleMapsUrl
-          }
+      findVenueById(eventModel.venueId.toString())
+        .then((venueData) => {
+          venue.value = venueData
         })
         .catch((venueErr) => {
           console.warn('Error loading venue:', venueErr)
@@ -410,14 +489,11 @@ const loadVenueAndOrganizer = async (event: EventModel) => {
     )
   }
 
-  if (event.promoterProfileId) {
+  if (eventModel.promoterProfileId) {
     promises.push(
-      findPromoterProfileById(event.promoterProfileId.toString())
-        .then((profile) => {
-          eventData.value = {
-            ...eventData.value,
-            promoter: profile.brandName
-          }
+      findPromoterProfileById(eventModel.promoterProfileId.toString())
+        .then((profileData) => {
+          promoterProfile.value = profileData
         })
         .catch((profileErr) => {
           console.warn('Error loading promoter profile:', profileErr)
@@ -428,29 +504,32 @@ const loadVenueAndOrganizer = async (event: EventModel) => {
   await Promise.all(promises)
 }
 
+const loadMinorsPolicyFile = async (fileId: string) => {
+  try {
+    const file = await findFileById(fileId)
+    minorsPolicyFile.value = file
+  } catch (err) {
+    console.warn('Error loading minors policy file:', err)
+  }
+}
+
 const loadTicketTypes = async (eventId: string) => {
   try {
-    const ticketTypes = await findTicketTypesByEvent(eventId)
+    const loadedTicketTypes = await findTicketTypesByEvent(eventId)
+    ticketTypes.value = loadedTicketTypes
     
-    const currentLocale = Locale.fromString(appLanguage.value)
-    const fallbackLocale = Locale.fromString('es-ES')
+    const published = loadedTicketTypes.filter(tt => tt.isPublished)
+    const firstTicketTypeWithPrice = published.find(tt => tt.price !== null)
     
-    eventData.value = {
-      ...eventData.value,
-      tickets: ticketTypes
-        .filter(tt => tt.isPublished)
-        .map(tt => ({
-          id: tt.id.toString(),
-          name: getLocalizedText(tt.name, 'Entrada sin nombre'),
-          description: getLocalizedText(tt.description, ''),
-          price: tt.price ? tt.price.amount() : 0,
-          available: tt.available
-        }))
+    if (!firstTicketTypeWithPrice || !firstTicketTypeWithPrice.price) {
+      throw new Error('No ticket type with price found')
     }
     
+    currency.value = firstTicketTypeWithPrice.price.currency()
+    
     const initialQuantities: Record<string, number> = {}
-    eventData.value.tickets.forEach(ticket => {
-      initialQuantities[ticket.id] = 0
+    published.forEach(ticketType => {
+      initialQuantities[ticketType.id.toString()] = 0
     })
     quantities.value = initialQuantities
   } catch (err) {
@@ -472,35 +551,62 @@ const totalTickets = computed(() => {
   return Object.values(quantities.value).reduce((a, b) => a + b, 0)
 })
 
-const subtotal = computed(() => {
-  return eventData.value.tickets.reduce((total: number, ticket) => {
-    return total + ticket.price * (quantities.value[ticket.id] || 0)
-  }, 0)
+const subtotal = computed((): Money => {
+  if (publishedTicketTypes.value.length === 0) {
+    throw new Error('Cannot calculate subtotal without tickets')
+  }
+  const firstTicketType = publishedTicketTypes.value[0]
+  if (!firstTicketType.price) {
+    throw new Error('First ticket type must have a price')
+  }
+  const initialTotal = Money.zero(firstTicketType.price.currency())
+  return publishedTicketTypes.value.reduce((total: Money, ticketType) => {
+    if (!ticketType.price) return total
+    const quantity = quantities.value[ticketType.id.toString()] || 0
+    if (quantity === 0) return total
+    const ticketPrice = ticketType.price as Money
+    const multipliedPrice = (ticketPrice as any).multiply(quantity) as Money
+    return (total as any).add(multipliedPrice) as Money
+  }, initialTotal)
 })
 
-const serviceFee = computed(() => {
-  return subtotal.value * 0.1 // 10% gastos de gestión
+const serviceFee = computed((): Money => {
+  return (subtotal.value as any).multiply(0.1) as Money // 10% gastos de gestión
 })
 
-const totalPrice = computed(() => {
-  return subtotal.value + serviceFee.value
+const totalPrice = computed((): Money => {
+  return (subtotal.value as any).add(serviceFee.value) as Money
 })
 
-const selectedTickets = computed(() => {
-  return eventData.value.tickets.filter((ticket) => quantities.value[ticket.id] > 0)
+const selectedTicketTypes = computed(() => {
+  return publishedTicketTypes.value.filter((ticketType) => quantities.value[ticketType.id.toString()] > 0)
 })
 
 const isOnSale = computed(() => {
-  return eventData.value.saleStatus === 'on-sale'
+  return event.value?.saleStatus === 'on-sale'
 })
 
 const minPrice = computed(() => {
-  if (eventData.value.tickets.length === 0) return 0
-  return Math.min(...eventData.value.tickets.map((t) => t.price))
+  if (publishedTicketTypes.value.length === 0) {
+    return Money.zero(currency.value)
+  }
+  const ticketTypesWithPrice = publishedTicketTypes.value.filter(tt => tt.price !== null)
+  if (ticketTypesWithPrice.length === 0) {
+    return Money.zero(currency.value)
+  }
+  return ticketTypesWithPrice.reduce((min, ticketType) => {
+    if (!ticketType.price) return min
+    return ticketType.price.amount() < min.amount() ? ticketType.price : min
+  }, ticketTypesWithPrice[0].price!)
 })
 
 const descriptionParagraphs = computed(() => {
-  return eventData.value.description.split('\n\n').filter((p) => p.trim())
+  return (eventDescription.value ?? '').split('\n\n').filter((p) => p.trim())
+})
+
+const minorsPolicyParagraphs = computed(() => {
+  if (!eventMinorsPolicyDescription.value) return []
+  return eventMinorsPolicyDescription.value.split('\n\n').filter((p) => p.trim())
 })
 
 const handleQuantityChange = (ticketId: string, quantity: number) => {
@@ -517,19 +623,19 @@ const handleCtaClick = () => {
   } else if (totalTickets.value > 0) {
     const { setCheckoutData } = useCheckout()
     setCheckoutData({
-      items: selectedTickets.value.map((ticket) => ({
-        id: ticket.id,
-        name: ticket.name,
-        price: ticket.price,
-        quantity: quantities.value[ticket.id]
+      items: selectedTicketTypes.value.map((ticketType) => ({
+        id: ticketType.id.toString(),
+        name: getTicketName(ticketType),
+        price: ticketType.price!.amount(),
+        quantity: quantities.value[ticketType.id.toString()]
       })),
       quantities: quantities.value,
-      subtotal: subtotal.value,
-      serviceFee: serviceFee.value,
-      total: totalPrice.value,
-      eventTitle: eventData.value.title,
-      eventDate: eventData.value.date,
-      eventVenue: `${eventData.value.venue}, ${eventData.value.city}`
+      subtotal: subtotal.value.amount(),
+      serviceFee: serviceFee.value.amount(),
+      total: totalPrice.value.amount(),
+      eventTitle: event.value?.title.valueForLocaleOrAutoFallback(currentLocale.value) || '',
+      eventDate: eventDate.value,
+      eventVenue: `${eventVenue.value}, ${eventCity.value}`
     })
     router.push('/checkout')
   }
@@ -559,7 +665,85 @@ onUnmounted(() => {
 <style lang="scss">
 .EventPage {
   min-height: 100vh;
-  background: var(--gradient-subtle);
+
+  &-hero-full {
+    width: 100%;
+    padding-top: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+
+    @media (min-width: 768px) {
+      margin-bottom: var(--spacing-2xl);
+    }
+  }
+
+  &-hero-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    margin: 0 auto;
+    max-width: 1280px;
+    padding: 0 var(--spacing-md);
+
+    @media (min-width: 768px) {
+      aspect-ratio: 3 / 1;
+      padding: 0 var(--spacing-md);
+    }
+  }
+
+  &-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  &-hero-status {
+    position: absolute;
+    bottom: var(--spacing-md);
+    left: var(--spacing-xl);
+
+    @media (min-width: 768px) {
+      bottom: var(--spacing-lg);
+      left: var(--spacing-2xl);
+    }
+  }
+
+  &-hero-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    margin: var(--spacing-lg) 0 0 0;
+    line-height: 1.2;
+
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  &-hero-subtitle {
+    font-size: 1rem;
+    color: var(--color-muted-foreground);
+    margin: var(--spacing-sm) 0 0 0;
+
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+    }
+  }
+
+  &-hero-info-desktop {
+    display: none;
+    margin-top: var(--spacing-lg);
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+  }
 
   &-hero {
     padding: var(--spacing-xl) 0;
@@ -653,6 +837,15 @@ onUnmounted(() => {
     }
   }
 
+  &-info-after-hero {
+    margin-bottom: var(--spacing-xl);
+    margin-top: var(--spacing-lg);
+
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
   &-main {
     padding-bottom: var(--spacing-xl);
   }
@@ -714,6 +907,29 @@ onUnmounted(() => {
     color: var(--color-muted-foreground);
     line-height: 1.75;
     margin-bottom: var(--spacing-md);
+  }
+
+  &-file-download {
+    margin-top: var(--spacing-md);
+  }
+
+  &-file-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
+
+    &-icon {
+      flex-shrink: 0;
+    }
   }
 
   &-conditions {

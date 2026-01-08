@@ -16,7 +16,9 @@
     "ticket": "ticket",
     "tickets": "tickets",
     "from": "From",
-    "venue_to_confirm": "Venue to be confirmed"
+    "venue_to_confirm": "Venue to be confirmed",
+    "minors_policy": "Minors Policy",
+    "download_authorization_file": "Download authorization"
   },
   "es-ES": {
     "organizer_to_confirm": "Organizador por confirmar",
@@ -35,7 +37,9 @@
     "ticket": "entrada",
     "tickets": "entradas",
     "from": "Desde",
-    "venue_to_confirm": "Venue por confirmar"
+    "venue_to_confirm": "Venue por confirmar",
+    "minors_policy": "Política de menores",
+    "download_authorization_file": "Descargar autorización"
   },
   "ca-ES": {
     "organizer_to_confirm": "Organitzador per confirmar",
@@ -54,7 +58,9 @@
     "ticket": "entrada",
     "tickets": "entrades",
     "from": "Des de",
-    "venue_to_confirm": "Venue per confirmar"
+    "venue_to_confirm": "Venue per confirmar",
+    "minors_policy": "Política de menors",
+    "download_authorization_file": "Descarregar autorització"
   },
   "eu-ES": {
     "organizer_to_confirm": "Antolatzailea berresteko",
@@ -73,7 +79,9 @@
     "ticket": "sarrera",
     "tickets": "sarrerak",
     "from": "Hasieratik",
-    "venue_to_confirm": "Venue berresteko"
+    "venue_to_confirm": "Venue berresteko",
+    "minors_policy": "Adingabeen politika",
+    "download_authorization_file": "Baimena deskargatu"
   },
   "gl-ES": {
     "organizer_to_confirm": "Organizador por confirmar",
@@ -92,6 +100,8 @@
     "ticket": "entrada",
     "tickets": "entradas",
     "from": "Desde",
-    "venue_to_confirm": "Venue por confirmar"
+    "venue_to_confirm": "Venue por confirmar",
+    "minors_policy": "Política de menores",
+    "download_authorization_file": "Descargar autorización"
   }
 }
