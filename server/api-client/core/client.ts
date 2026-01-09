@@ -10,6 +10,12 @@ interface RequestOptions {
   body?: any
 }
 
+export interface RawResponse {
+  buffer: Buffer
+  statusCode: number
+  headers: Record<string, string | string[]>
+}
+
 export class CoreApiClient {
   private readonly baseUrl: string
   private readonly apiKey?: string
@@ -33,6 +39,76 @@ export class CoreApiClient {
 
   async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: 'DELETE' })
+  }
+
+  async getRaw(endpoint: string): Promise<RawResponse> {
+    const fullUrl = `${this.baseUrl}${endpoint}`
+
+    try {
+      const https = await import('https')
+
+      const agent = new https.Agent({
+        rejectUnauthorized: false
+      })
+
+      const url = new URL(fullUrl)
+      const port = url.port ? parseInt(url.port) : (url.protocol === 'https:' ? 443 : 80)
+      const hostname = url.hostname
+
+      const headers: Record<string, string> = {
+        'Host': url.host
+      }
+
+      if (this.apiKey) {
+        headers['X-API-Key'] = this.apiKey
+      }
+
+      return new Promise<RawResponse>((resolve, reject) => {
+        const requestOptions = {
+          hostname,
+          port,
+          path: url.pathname + url.search,
+          method: 'GET',
+          headers,
+          agent,
+          rejectUnauthorized: false
+        }
+
+        const req = https.request(requestOptions, (res) => {
+          const chunks: Buffer[] = []
+
+          res.on('data', (chunk) => {
+            chunks.push(chunk)
+          })
+
+          res.on('end', () => {
+            const buffer = Buffer.concat(chunks)
+            const responseHeaders: Record<string, string | string[]> = {}
+            
+            Object.keys(res.headers).forEach(key => {
+              const value = res.headers[key]
+              if (value !== undefined) {
+                responseHeaders[key] = value
+              }
+            })
+
+            resolve({
+              buffer,
+              statusCode: res.statusCode || 200,
+              headers: responseHeaders
+            })
+          })
+        })
+
+        req.on('error', (error) => {
+          reject(error)
+        })
+
+        req.end()
+      })
+    } catch (error: any) {
+      throw error
+    }
   }
 
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {

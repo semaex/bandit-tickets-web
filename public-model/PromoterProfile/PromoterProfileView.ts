@@ -1,4 +1,5 @@
 import { Uuid } from '../../shared/Uuid'
+import { Address } from '../../shared/Address'
 import { CorePromoterProfileEntityType } from '../../server/core-model/PromoterProfile/CorePromoterProfileEntityType'
 
 export class PromoterProfileView {
@@ -10,9 +11,7 @@ export class PromoterProfileView {
     public readonly logoImage: string | null,
     public readonly legalName: string,
     public readonly taxId: string,
-    public readonly address: Record<string, any> | null,
-    public readonly supportEmail: string | null,
-    public readonly supportPhone: string | null
+    public readonly address: Address | null
   ) {}
 }
 

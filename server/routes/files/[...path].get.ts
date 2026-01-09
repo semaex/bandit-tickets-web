@@ -1,113 +1,62 @@
+import { coreApiClient } from '../../api-client/core'
+import { getRouterParamOrFail } from '../../utils/params'
+
 export default defineEventHandler(async (event) => {
-  const path = getRouterParam(event, 'path')
-
-  if (!path) {
-    throw createError({
-      statusCode: 400,
-      message: 'File path is required'
-    })
-  }
-
-  const config = useRuntimeConfig()
-  const coreUrl = (config.banditTicketsCoreUrl || config.BANDIT_TICKETS_CORE_URL) as string | undefined
-
-  if (!coreUrl || typeof coreUrl !== 'string') {
-    throw createError({
-      statusCode: 500,
-      message: 'Core API URL is not configured'
-    })
-  }
-
-  const cleanCoreUrl = coreUrl.replace(/\/$/, '')
+  const path = getRouterParamOrFail(event, 'path')
+  
   const pathString = Array.isArray(path) ? path.join('/') : path
   const cleanPath = pathString.startsWith('/') ? pathString.substring(1) : pathString
-  const coreApiUrl = `${cleanCoreUrl}/files/${cleanPath}`
+  const endpoint = `/files/${cleanPath}`
 
   try {
-    const https = await import('https')
+    const response = await coreApiClient.getRaw(endpoint)
 
-    const agent = new https.Agent({
-      rejectUnauthorized: false
-    })
-
-    const url = new URL(coreApiUrl)
-    const port = url.port ? parseInt(url.port) : (url.protocol === 'https:' ? 443 : 80)
-    const hostname = url.hostname
-
-    return new Promise((resolve, reject) => {
-      const options = {
-        hostname: hostname,
-        port: port,
-        path: url.pathname + url.search,
-        method: 'GET',
-        headers: {
-          'Host': url.host
-        },
-        agent: agent,
-        rejectUnauthorized: false,
-        followRedirect: false
-      }
-
-      const req = https.request(options, (res) => {
-        if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307 || res.statusCode === 308) {
-          const location = res.headers.location
-          if (location) {
-            let cleanLocation = location as string
-            if (cleanLocation.includes('://')) {
-              const [protocol, rest] = cleanLocation.split('://', 2)
-              cleanLocation = protocol + '://' + rest.replace(/\/+/g, '/')
-            } else {
-              cleanLocation = cleanLocation.replace(/\/+/g, '/')
-            }
-            setHeader(event, 'Location', cleanLocation)
-            setHeader(event, 'Cache-Control', 'public, max-age=31536000')
-            setResponseStatus(event, res.statusCode || 302)
-            resolve(null)
-            return
-          }
+    if (response.statusCode === 301 || response.statusCode === 302 || response.statusCode === 307 || response.statusCode === 308) {
+      const location = response.headers.location
+      if (location) {
+        let cleanLocation = Array.isArray(location) ? location[0] : location
+        if (cleanLocation.includes('://')) {
+          const [protocol, rest] = cleanLocation.split('://', 2)
+          cleanLocation = protocol + '://' + rest.replace(/\/+/g, '/')
+        } else {
+          cleanLocation = cleanLocation.replace(/\/+/g, '/')
         }
+        setHeader(event, 'Location', cleanLocation)
+        setHeader(event, 'Cache-Control', 'public, max-age=31536000')
+        setResponseStatus(event, response.statusCode)
+        return null
+      }
+    }
 
-        const chunks: Buffer[] = []
-
-        res.on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-
-        res.on('end', () => {
-          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            const buffer = Buffer.concat(chunks)
-            
-            setHeader(event, 'Content-Type', res.headers['content-type'] || 'application/octet-stream')
-            setHeader(event, 'Content-Length', res.headers['content-length'] ? parseInt(res.headers['content-length'] as string, 10) : buffer.length)
-            
-            if (res.headers['content-disposition']) {
-              setHeader(event, 'Content-Disposition', res.headers['content-disposition'])
-            }
-            
-            if (res.headers['cache-control']) {
-              setHeader(event, 'Cache-Control', res.headers['cache-control'])
-            }
-            
-            if (res.headers['etag']) {
-              setHeader(event, 'ETag', res.headers['etag'])
-            }
-            
-            resolve(buffer)
-          } else {
-            reject(new Error(`Request failed with status ${res.statusCode}`))
-          }
-        })
-      })
-
-      req.on('error', (error) => {
-        reject(error)
-      })
-
-      req.end()
-    })
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      const contentType = response.headers['content-type']
+      setHeader(event, 'Content-Type', Array.isArray(contentType) ? contentType[0] : contentType || 'application/octet-stream')
+      
+      const contentLength = response.headers['content-length']
+      setHeader(event, 'Content-Length', contentLength ? (Array.isArray(contentLength) ? parseInt(contentLength[0], 10) : parseInt(contentLength as string, 10)) : response.buffer.length)
+      
+      if (response.headers['content-disposition']) {
+        const contentDisposition = response.headers['content-disposition']
+        setHeader(event, 'Content-Disposition', Array.isArray(contentDisposition) ? contentDisposition[0] : contentDisposition)
+      }
+      
+      if (response.headers['cache-control']) {
+        const cacheControl = response.headers['cache-control']
+        setHeader(event, 'Cache-Control', Array.isArray(cacheControl) ? cacheControl[0] : cacheControl)
+      }
+      
+      if (response.headers['etag']) {
+        const etag = response.headers['etag']
+        setHeader(event, 'ETag', Array.isArray(etag) ? etag[0] : etag)
+      }
+      
+      return response.buffer
+    } else {
+      throw new Error(`Request failed with status ${response.statusCode}`)
+    }
   } catch (error: any) {
     console.error('[BFF] Error serving public file from core:', {
-      url: coreApiUrl,
+      endpoint,
       error: error.message || error
     })
 

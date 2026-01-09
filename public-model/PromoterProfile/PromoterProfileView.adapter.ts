@@ -1,7 +1,16 @@
 import { PromoterProfileView } from './PromoterProfileView'
 import type { CorePromoterProfile } from '../../server/core-model/PromoterProfile/CorePromoterProfile'
 import { Uuid } from '../../shared/Uuid'
+import { Address } from '../../shared/Address'
 import { CorePromoterProfileEntityType } from '../../server/core-model/PromoterProfile/CorePromoterProfileEntityType'
+
+type AddressJson = {
+  street: string
+  city: string
+  region?: string | null
+  postalCode: string
+  countryCode: string
+}
 
 export interface PromoterProfileViewJson {
   id: string
@@ -11,9 +20,7 @@ export interface PromoterProfileViewJson {
   logoImage: string | null
   legalName: string
   taxId: string
-  address: Record<string, any> | null
-  supportEmail: string | null
-  supportPhone: string | null
+  address: AddressJson | null
 }
 
 export function promoterProfileViewFromJson(json: PromoterProfileViewJson): PromoterProfileView {
@@ -25,9 +32,7 @@ export function promoterProfileViewFromJson(json: PromoterProfileViewJson): Prom
     json.logoImage,
     json.legalName,
     json.taxId,
-    json.address,
-    json.supportEmail,
-    json.supportPhone
+    json.address ? Address.fromArray(json.address) : null
   )
 }
 
@@ -40,9 +45,7 @@ export function promoterProfileViewToJson(promoterProfileView: PromoterProfileVi
     logoImage: promoterProfileView.logoImage,
     legalName: promoterProfileView.legalName,
     taxId: promoterProfileView.taxId,
-    address: promoterProfileView.address,
-    supportEmail: promoterProfileView.supportEmail,
-    supportPhone: promoterProfileView.supportPhone
+    address: promoterProfileView.address ? promoterProfileView.address.toArray() : null
   }
 }
 
@@ -55,9 +58,7 @@ export function promoterProfileViewFromCorePromoterProfileAdapter(corePromoterPr
       corePromoterProfile.logoImage,
       corePromoterProfile.legalName,
       corePromoterProfile.taxId,
-      corePromoterProfile.address,
-      corePromoterProfile.supportEmail?.toString() ?? null,
-      corePromoterProfile.supportPhone?.toString() ?? null
+      corePromoterProfile.address ? Address.fromArray(corePromoterProfile.address as AddressJson) : null
     )
   }
 

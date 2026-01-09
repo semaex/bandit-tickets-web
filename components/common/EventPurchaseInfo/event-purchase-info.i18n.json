@@ -1,0 +1,43 @@
+{
+  "en-GB": {
+    "support_info_title": "Customer service",
+    "support_info_promoter_case": "Customer service for this event is the responsibility of the organizer. Bandit Tickets acts solely as a technology provider for ticket issuance and validation. For any issues related to the ticket, you can contact %s.",
+    "support_info_bandit_case": "Bandit Tickets provides customer service on behalf of the organizer of this event. For any issues related to the ticket, you can contact %s.",
+    "billing_info_title": "Billing",
+    "billing_info_text": "The event organizer is responsible for billing the total amount, including the ticket price and management fees.",
+    "ticket_amount_includes_taxes": "The amounts for this ticket include taxes."
+  },
+  "es-ES": {
+    "support_info_title": "Atención al cliente",
+    "support_info_promoter_case": "La atención al cliente de este evento es responsabilidad del organizador. Bandit Tickets actúa únicamente como proveedor tecnológico para la emisión y validación de las entradas. Para cualquier incidencia relacionada con la entrada, puede contactar con %s.",
+    "support_info_bandit_case": "Bandit Tickets presta el servicio de atención al cliente en nombre del organizador de este evento. Para cualquier incidencia relacionada con la entrada, puede contactar con %s.",
+    "billing_info_title": "Facturación",
+    "billing_info_text": "El organizador del evento es responsable de la facturación del importe total, incluyendo el precio de la entrada y los gastos de gestión.",
+    "ticket_amount_includes_taxes": "Los importes de esta entrada incluyen impuestos."
+  },
+  "ca-ES": {
+    "support_info_title": "Atenció al client",
+    "support_info_promoter_case": "L'atenció al client d'aquest esdeveniment és responsabilitat de l'organitzador. Bandit Tickets actua únicament com a proveïdor tecnològic per a l'emissió i validació de les entrades. Per a qualsevol incidència relacionada amb l'entrada, podeu contactar amb %s.",
+    "support_info_bandit_case": "Bandit Tickets presta el servei d'atenció al client en nom de l'organitzador d'aquest esdeveniment. Per a qualsevol incidència relacionada amb l'entrada, podeu contactar amb %s.",
+    "billing_info_title": "Facturació",
+    "billing_info_text": "L'organitzador de l'esdeveniment és responsable de la facturació de l'import total, incloent el preu de l'entrada i les despeses de gestió.",
+    "ticket_amount_includes_taxes": "Els imports d'aquesta entrada inclouen impostos."
+  },
+  "eu-ES": {
+    "support_info_title": "Bezeroaren arreta",
+    "support_info_promoter_case": "Ekitaldi honetako bezeroaren arreta antolatzailearen erantzukizuna da. Bandit Tickets sarrerak emateko eta balioztatzeko hornitzaile teknologiko gisa soilik jarduten du. Sarrerari lotutako edozein arazo, %s-rekin harremanetan jar zaitezke.",
+    "support_info_bandit_case": "Bandit Tickets-ek ekitaldi honetako antolatzailearen izenean bezeroaren arreta eskaintzen du. Sarrerari lotutako edozein arazo, %s-rekin harremanetan jar zaitezke.",
+    "billing_info_title": "Fakturazioa",
+    "billing_info_text": "Ekitaldiaren antolatzailea guztizko zenbatekoaren fakturazioaren erantzule da, sarreraren prezioa eta kudeaketa gastuak barne.",
+    "ticket_amount_includes_taxes": "Sarrera honen zenbatekoek zergak barne hartzen dituzte."
+  },
+  "gl-ES": {
+    "support_info_title": "Atención ao cliente",
+    "support_info_promoter_case": "A atención ao cliente deste evento é responsabilidade do organizador. Bandit Tickets actúa unicamente como provedor tecnolóxico para a emisión e validación das entradas. Para calquera incidencia relacionada coa entrada, pode contactar con %s.",
+    "support_info_bandit_case": "Bandit Tickets presta o servizo de atención ao cliente en nome do organizador deste evento. Para calquera incidencia relacionada coa entrada, pode contactar con %s.",
+    "billing_info_title": "Facturación",
+    "billing_info_text": "O organizador do evento é responsable da facturación do importe total, incluíndo o prezo da entrada e os gastos de xestión.",
+    "ticket_amount_includes_taxes": "Os importes desta entrada inclúen impostos."
+  }
+}
+

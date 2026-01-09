@@ -16,20 +16,20 @@
       </div>
 
       <!-- Event Content -->
-      <template v-else-if="event!==null">
+      <template v-else-if="eventView!==null">
       <!-- Hero Section - Full Width (if image exists) -->
       <section v-if="hasHeroImage" class="EventPage-hero-full">
         <div class="EventPage-hero-image-wrapper">
           <img
             :src="eventImageUrl"
-            :alt="event.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
+            :alt="eventView.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
             class="EventPage-hero-image"
           />
         </div>
         <div class="container">
-          <h1 class="EventPage-hero-title">{{ event?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
-          <p v-if="event?.subtitle && !event.subtitle.isEmpty() && event.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-hero-subtitle">
-            {{ event.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
+          <h1 class="EventPage-hero-title">{{ eventView?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
+          <p v-if="eventView?.subtitle && !eventView.subtitle.isEmpty() && eventView.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-hero-subtitle">
+            {{ eventView.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
           </p>
           
           <!-- Quick Info - Desktop -->
@@ -56,7 +56,7 @@
               <div class="EventPage-image-container">
                 <img
                   :src="eventImageUrl || '/placeholder-event.jpg'"
-                  :alt="event?.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
+                  :alt="eventView?.title.valueForLocaleOrAutoFallback(currentLocale) || ''"
                   class="EventPage-image"
                 />
               </div>
@@ -64,9 +64,9 @@
 
             <!-- Event Header Info -->
             <div class="EventPage-header">
-              <h1 class="EventPage-title">{{ event?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
-              <p v-if="event?.subtitle && !event.subtitle.isEmpty() && event.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-subtitle">
-                {{ event.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
+              <h1 class="EventPage-title">{{ eventView?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
+              <p v-if="eventView?.subtitle && !eventView.subtitle.isEmpty() && eventView.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-subtitle">
+                {{ eventView.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
               </p>
               
               <!-- Quick Info - Desktop -->
@@ -187,6 +187,13 @@
                   <h2 class="EventPage-section-title">{{ trans('eventPage.conditions') }}</h2>
                   <p class="EventPage-conditions" v-html="formattedTerms"></p>
                 </section>
+
+                <!-- Purchase Info -->
+                <section v-if="eventPurchaseView?.buyerSupportView" class="EventPage-section EventPage-section--bordered">
+                  <EventPurchaseInfo
+                    :buyer-support-view="eventPurchaseView.buyerSupportView"
+                  />
+                </section>
               </div>
             </div>
 
@@ -213,7 +220,7 @@
                     <span class="EventPage-summary-value">{{ subtotal.formatted() }}</span>
                   </div>
                   <div class="EventPage-summary-line">
-                    <span class="EventPage-summary-label">{{ trans('eventPage.service_fee') }}</span>
+                    <span class="EventPage-summary-label">{{ serviceFeeLabel }}</span>
                     <span class="EventPage-summary-value">{{ serviceFee.formatted() }}</span>
                   </div>
                 </div>
@@ -283,14 +290,14 @@ import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import EventInfo from '../../common/EventInfo/EventInfo.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
 import GenreChip from '../../common/GenreChip/GenreChip.vue'
+import EventPurchaseInfo from '../../common/EventPurchaseInfo/EventPurchaseInfo.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
-import { useCheckout } from '../../../composables/useCheckout'
+import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
-import { findEventViewBySlug } from '../../../public-model/Event/EventView.services'
+import { findEventPurchaseViewBySlug } from '../../../public-model/Event/EventView.services'
 import type { EventView } from '../../../public-model/Event/EventView'
-import { findVenueViewById } from '../../../public-model/Venue/VenueView.services'
-import { findPromoterProfileViewById } from '../../../public-model/PromoterProfile/PromoterProfile.services'
+import type { EventPurchaseView } from '../../../public-model/Event/EventPurchaseView'
 import type { PromoterProfileView } from '../../../public-model/PromoterProfile/PromoterProfileView'
 import { findTicketTypeViewsByEvent } from '../../../public-model/TicketType/TicketTypeView.services'
 import type { TicketTypeView } from '../../../public-model/TicketType/TicketTypeView'
@@ -315,9 +322,10 @@ const { trans, appLanguage } = useAppLanguage()
 
 const loading = ref(true)
 const error = ref<string | null>(null)
-const event = ref<EventView | null>(null)
-const venueView = ref<VenueView | null>(null)
-const promoterProfileView = ref<PromoterProfileView | null>(null)
+const eventPurchaseView = ref<EventPurchaseView | null>(null)
+const eventView = computed(() => eventPurchaseView.value?.eventView || null)
+const venueView = computed(() => eventPurchaseView.value?.venueView || null)
+const promoterProfileView = computed(() => eventPurchaseView.value?.promoterProfileView || null)
 const ticketTypeViews = ref<TicketTypeView[]>([])
 const minorsPolicyFileView = ref<FileView | null>(null)
 const currency = ref<Currency>(Currency.EUR)
@@ -340,14 +348,14 @@ const publishedTicketTypes = computed(() => {
 
 
 const eventDate = computed(() => {
-  return event.value ? formatDates(event.value.dates) : ''
+  return eventView.value ? formatDates(eventView.value.dates) : ''
 })
 
 const eventTime = computed(() => {
-  if (!event.value) return ''
-  if (!event.value.startTime) return ''
-  const timeStr = formatTime(event.value.startTime as import('../../../shared/Time').Time)
-  const doorsTime = event.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.value.doorsOpenTime as import('../../../shared/Time').Time)})` : ''
+  if (!eventView.value) return ''
+  if (!eventView.value.startTime) return ''
+  const timeStr = formatTime(eventView.value.startTime as import('../../../shared/Time').Time)
+  const doorsTime = eventView.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(eventView.value.doorsOpenTime as import('../../../shared/Time').Time)})` : ''
   return `${timeStr}${doorsTime}`
 })
 
@@ -356,7 +364,7 @@ const eventVenue = computed(() => {
 })
 
 const eventCity = computed(() => {
-  return venueView.value?.city || (venueView.value?.countryCode ? venueView.value.countryCode.toString() : (event.value?.countryCode ? event.value.countryCode.toString() : ''))
+  return venueView.value?.city || (venueView.value?.countryCode ? venueView.value.countryCode.toString() : (eventView.value?.countryCode ? eventView.value.countryCode.toString() : ''))
 })
 
 const eventVenueAddress = computed(() => {
@@ -369,38 +377,38 @@ const eventVenueGoogleMapsUrl = computed(() => {
 })
 
 const eventPromoter = computed(() => {
-  return promoterProfileView.value?.brandName || (event.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : '')
+  return promoterProfileView.value?.brandName || (eventView.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : '')
 })
 
 const eventTicketSaleClosesAt = computed(() => {
-  return event.value?.ticketSaleClosesAt ? formatDate(event.value.ticketSaleClosesAt) : undefined
+  return eventView.value?.ticketSaleClosesAt ? formatDate(eventView.value.ticketSaleClosesAt) : undefined
 })
 
 const eventMusicGenres = computed(() => {
-  return event.value?.musicGenres || []
+  return eventView.value?.musicGenres || []
 })
 
 const eventDescription = computed(() => {
-  if (!event.value || !event.value.description || event.value.description.isEmpty()) return ''
-  return event.value.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+  if (!eventView.value || !eventView.value.description || eventView.value.description.isEmpty()) return ''
+  return eventView.value.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
 })
 
 const eventTerms = computed(() => {
-  if (!event.value || !event.value.terms || event.value.terms.isEmpty()) return ''
-  return event.value.terms.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+  if (!eventView.value || !eventView.value.terms || eventView.value.terms.isEmpty()) return ''
+  return eventView.value.terms.valueForLocaleOrAutoFallback(currentLocale.value) || ''
 })
 
 const eventImageUrl = computed(() => {
-  return event.value?.imageUrl ? event.value.imageUrl.toString() : undefined
+  return eventView.value?.imageUrl ? eventView.value.imageUrl.toString() : undefined
 })
 
 const eventHasMinorsPolicy = computed(() => {
-  return event.value?.hasMinorsPolicy || false
+  return eventView.value?.hasMinorsPolicy || false
 })
 
 const eventMinorsPolicyDescription = computed(() => {
-  if (!event.value || !event.value.minorsPolicyDescription || event.value.minorsPolicyDescription.isEmpty()) return ''
-  return event.value.minorsPolicyDescription.valueForLocaleOrAutoFallback(currentLocale.value) || ''
+  if (!eventView.value || !eventView.value.minorsPolicyDescription || eventView.value.minorsPolicyDescription.isEmpty()) return ''
+  return eventView.value.minorsPolicyDescription.valueForLocaleOrAutoFallback(currentLocale.value) || ''
 })
 
 const formatDate = (date: Date | null): string => {
@@ -442,55 +450,22 @@ const loadEvent = async () => {
   error.value = null
   
   try {
-    const eventModel = await findEventViewBySlug(props.slug)
-    
-    const venueName = trans('eventPage.venue_to_confirm')
-    const venueCity = eventModel.countryCode ? eventModel.countryCode.toString() : ''
-    
-    event.value = eventModel
+    const purchaseView = await findEventPurchaseViewBySlug(props.slug)
+    eventPurchaseView.value = purchaseView
     
     loading.value = false
     
-    loadVenueAndOrganizer(eventModel)
-    loadTicketTypes(eventModel.id.toString())
-    if (eventModel.hasMinorsPolicy && eventModel.minorsPolicyAthorizationFileId) {
-      loadMinorsPolicyFile(eventModel.minorsPolicyAthorizationFileId.toString())
+    if (purchaseView.eventView) {
+      loadTicketTypes(purchaseView.eventView.id.toString())
+      if (purchaseView.eventView.hasMinorsPolicy && purchaseView.eventView.minorsPolicyAthorizationFileId) {
+        loadMinorsPolicyFile(purchaseView.eventView.minorsPolicyAthorizationFileId.toString())
+      }
     }
   } catch (err) {
     error.value = 'Error al cargar el evento'
     console.error('Error loading event:', err)
     loading.value = false
   }
-}
-
-const loadVenueAndOrganizer = async (eventModel: EventView) => {
-  const promises: Promise<void>[] = []
-  
-  if (eventModel.venueId) {
-    promises.push(
-      findVenueViewById(eventModel.venueId.toString())
-        .then((venueData) => {
-          venueView.value = venueData
-        })
-        .catch((venueErr) => {
-          console.warn('Error loading venue:', venueErr)
-        })
-    )
-  }
-
-  if (eventModel.promoterProfileId) {
-    promises.push(
-      findPromoterProfileViewById(eventModel.promoterProfileId.toString())
-        .then((profileData: PromoterProfileView) => {
-          promoterProfileView.value = profileData
-        })
-        .catch((profileErr: any) => {
-          console.warn('Error loading promoter profile:', profileErr)
-        })
-    )
-  }
-  
-  await Promise.all(promises)
 }
 
 const loadMinorsPolicyFile = async (fileId: string) => {
@@ -516,9 +491,17 @@ const loadTicketTypes = async (eventId: string) => {
     
     currency.value = firstTicketTypeWithPrice.price.currency()
     
+    const { getCheckoutData } = useCheckout()
+    const savedCheckout = getCheckoutData()
+    
     const initialQuantities: Record<string, number> = {}
     published.forEach((ticketType: TicketTypeView) => {
-      initialQuantities[ticketType.id.toString()] = 0
+      const ticketId = ticketType.id.toString()
+      if (savedCheckout && savedCheckout.eventSlug === props.slug && savedCheckout.quantities[ticketId] !== undefined) {
+        initialQuantities[ticketId] = savedCheckout.quantities[ticketId]
+      } else {
+        initialQuantities[ticketId] = 0
+      }
     })
     quantities.value = initialQuantities
   } catch (err) {
@@ -560,7 +543,23 @@ const subtotal = computed((): Money => {
 })
 
 const serviceFee = computed((): Money => {
-  return (subtotal.value as any).multiply(0.1) as Money // 10% gastos de gestión
+  if (!eventPurchaseView.value) {
+    return Money.zero(currency.value)
+  }
+  const feeDecimal = eventPurchaseView.value.buyerFeePercent / 100
+  return (subtotal.value as any).multiply(feeDecimal) as Money
+})
+
+const serviceFeeLabel = computed(() => {
+  const baseLabel = trans('eventPage.service_fee')
+  if (!eventPurchaseView.value) {
+    return baseLabel
+  }
+  const percent = eventPurchaseView.value.buyerFeePercent
+  if (percent === 0) {
+    return baseLabel
+  }
+  return `${baseLabel} (${percent}%)`
 })
 
 const totalPrice = computed((): Money => {
@@ -615,14 +614,15 @@ const handleCtaClick = () => {
       items: selectedTicketTypes.value.map((ticketType) => ({
         id: ticketType.id.toString(),
         name: getTicketName(ticketType),
-        price: ticketType.price!.amount(),
+        price: ticketType.price!,
         quantity: quantities.value[ticketType.id.toString()]
       })),
       quantities: quantities.value,
-      subtotal: subtotal.value.amount(),
-      serviceFee: serviceFee.value.amount(),
-      total: totalPrice.value.amount(),
-      eventTitle: event.value?.title.valueForLocaleOrAutoFallback(currentLocale.value) || '',
+      subtotal: subtotal.value,
+      serviceFee: serviceFee.value,
+      total: totalPrice.value,
+      eventSlug: props.slug,
+      eventTitle: eventView.value?.title.valueForLocaleOrAutoFallback(currentLocale.value) || '',
       eventDate: eventDate.value,
       eventVenue: `${eventVenue.value}, ${eventCity.value}`
     })

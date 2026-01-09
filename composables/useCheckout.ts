@@ -1,24 +1,26 @@
 import { ref, computed } from 'vue'
+import type { Money } from '../shared/Money'
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
-  price: number
+  price: Money
   quantity: number
 }
 
-interface CheckoutData {
+export interface CheckoutData {
   items: CartItem[]
   quantities: Record<string, number>
-  subtotal: number
-  serviceFee: number
-  total: number
+  subtotal: Money
+  serviceFee: Money
+  total: Money
+  eventSlug: string
   eventTitle: string
   eventDate: string
   eventVenue: string
 }
 
-interface PaymentData {
+export interface PaymentData {
   success: boolean
   orderNumber?: string
   eventTitle?: string

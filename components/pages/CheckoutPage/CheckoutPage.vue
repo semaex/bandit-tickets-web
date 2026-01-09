@@ -8,9 +8,7 @@
             class="CheckoutPage-back-button"
             @click="handleBack"
           >
-            <svg class="CheckoutPage-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <Icon name="chevron-left" size="sm" class="CheckoutPage-back-icon" />
             <span class="CheckoutPage-back-text">{{ trans('checkoutPage.back') }}</span>
           </button>
         </div>
@@ -35,9 +33,7 @@
                 <div class="CheckoutPage-card">
                   <div class="CheckoutPage-card-header">
                     <div class="CheckoutPage-icon-wrapper">
-                      <svg class="CheckoutPage-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                      <Icon name="user" size="md" class="CheckoutPage-icon" />
                     </div>
                     <div>
                       <h2 class="CheckoutPage-card-title">{{ trans('checkoutPage.buyer_data_title') }}</h2>
@@ -51,9 +47,7 @@
                     <div class="CheckoutPage-form-group">
                       <label for="name" class="CheckoutPage-label">{{ trans('checkoutPage.full_name_label') }}</label>
                       <div class="CheckoutPage-input-wrapper">
-                        <svg class="CheckoutPage-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <Icon name="user" size="sm" class="CheckoutPage-input-icon" />
                         <input
                           id="name"
                           v-model="formData.name"
@@ -68,9 +62,7 @@
                     <div class="CheckoutPage-form-group">
                       <label for="email" class="CheckoutPage-label">{{ trans('checkoutPage.email_label') }}</label>
                       <div class="CheckoutPage-input-wrapper">
-                        <svg class="CheckoutPage-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
+                        <Icon name="mail" size="sm" class="CheckoutPage-input-icon" />
                         <input
                           id="email"
                           v-model="formData.email"
@@ -102,22 +94,21 @@
 
                     <!-- Mobile Submit -->
                     <div class="CheckoutPage-mobile-submit">
-                      <button
-                        type="submit"
-                        class="CheckoutPage-submit-button"
+                      <ButtonCustom
+                        type="primary"
                         :disabled="isSubmitting"
+                        :full-width="true"
+                        @click="handleSubmit"
                       >
                         {{ isSubmitting ? trans('checkoutPage.processing') : trans('checkoutPage.pay_now') }}
-                      </button>
+                      </ButtonCustom>
                     </div>
                   </form>
                 </div>
 
                 <!-- Security Note -->
                 <div class="CheckoutPage-security">
-                  <svg class="CheckoutPage-security-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+                  <Icon name="shield-check" size="md" class="CheckoutPage-security-icon" />
                   <div>
                     <p class="CheckoutPage-security-title">{{ trans('checkoutPage.secure_purchase_title') }}</p>
                     <p class="CheckoutPage-security-text">
@@ -133,9 +124,7 @@
                   <!-- Event Info -->
                   <div class="CheckoutPage-event-info">
                     <div class="CheckoutPage-event-icon-wrapper">
-                      <svg class="CheckoutPage-event-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
-                      </svg>
+                      <Icon name="ticket" size="md" class="CheckoutPage-event-icon" />
                     </div>
                     <div class="CheckoutPage-event-details">
                       <h3 class="CheckoutPage-event-title">{{ checkoutData.eventTitle }}</h3>
@@ -156,7 +145,7 @@
                         {{ item.quantity }}x {{ item.name }}
                       </span>
                       <span class="CheckoutPage-item-price">
-                        {{ (item.price * item.quantity).toFixed(2) }} €
+                        {{ item.price.multiply(item.quantity).formatted() }}
                       </span>
                     </div>
                   </div>
@@ -166,13 +155,13 @@
                     <div class="CheckoutPage-total-line">
                       <span class="CheckoutPage-total-label">{{ trans('checkoutPage.subtotal') }}</span>
                       <span class="CheckoutPage-total-value">
-                        {{ checkoutData.subtotal.toFixed(2) }} €
+                        {{ checkoutData.subtotal.formatted() }}
                       </span>
                     </div>
                     <div class="CheckoutPage-total-line">
                       <span class="CheckoutPage-total-label">{{ trans('checkoutPage.service_fee') }}</span>
                       <span class="CheckoutPage-total-value">
-                        {{ checkoutData.serviceFee.toFixed(2) }} €
+                        {{ checkoutData.serviceFee.formatted() }}
                       </span>
                     </div>
                   </div>
@@ -181,19 +170,19 @@
                   <div class="CheckoutPage-final-total">
                     <span class="CheckoutPage-final-total-label">{{ trans('checkoutPage.total') }}</span>
                     <span class="CheckoutPage-final-total-value">
-                      {{ checkoutData.total.toFixed(2) }} €
+                      {{ checkoutData.total.formatted() }}
                     </span>
                   </div>
 
                   <!-- Desktop Submit -->
-                  <button
-                    type="submit"
-                    class="CheckoutPage-desktop-submit"
+                  <ButtonCustom
+                    type="primary"
                     :disabled="isSubmitting"
+                    :full-width="true"
                     @click="handleSubmit"
                   >
-                    {{ isSubmitting ? 'Procesando...' : 'Pagar ahora' }}
-                  </button>
+                    {{ isSubmitting ? trans('checkoutPage.processing') : trans('checkoutPage.pay_now') }}
+                  </ButtonCustom>
                 </div>
               </aside>
             </div>
@@ -208,7 +197,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
-import { useCheckout } from '../../../composables/useCheckout'
+import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
+import Icon from '../../ui/icon/Icon.vue'
+import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
 import checkoutPageTranslations from './checkout-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
@@ -218,24 +209,6 @@ translationService.addTranslations('checkoutPage', checkoutPageTranslations)
 
 // Use translation composable
 const { trans } = useAppLanguage()
-
-interface CartItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
-
-interface CheckoutData {
-  items: CartItem[]
-  quantities: Record<string, number>
-  subtotal: number
-  serviceFee: number
-  total: number
-  eventTitle: string
-  eventDate: string
-  eventVenue: string
-}
 
 const router = useRouter()
 const { getCheckoutData, setCheckoutData } = useCheckout()
@@ -255,7 +228,12 @@ const acceptTerms = ref(false)
 const isSubmitting = ref(false)
 
 const handleBack = () => {
-  router.push('/event')
+  const eventSlug = checkoutData.value?.eventSlug
+  if (eventSlug) {
+    router.push(`/event/${eventSlug}`)
+  } else {
+    router.push('/')
+  }
 }
 
 const handleSubmit = async () => {
@@ -282,7 +260,7 @@ const handleSubmit = async () => {
       eventTitle: checkoutData.value?.eventTitle,
       eventDate: checkoutData.value?.eventDate,
       eventVenue: checkoutData.value?.eventVenue,
-      items: checkoutData.value?.items.map((item) => ({
+      items: checkoutData.value?.items.map((item: any) => ({
         name: item.name,
         quantity: item.quantity
       })),
@@ -325,8 +303,7 @@ const handleSubmit = async () => {
   }
 
   &-back-icon {
-    width: 16px;
-    height: 16px;
+    flex-shrink: 0;
   }
 
   &-back-text {
@@ -424,8 +401,6 @@ const handleSubmit = async () => {
   }
 
   &-icon {
-    width: 20px;
-    height: 20px;
     color: var(--color-primary);
   }
 
@@ -468,8 +443,6 @@ const handleSubmit = async () => {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
@@ -532,28 +505,6 @@ const handleSubmit = async () => {
     }
   }
 
-  &-submit-button {
-    width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color var(--transition-base);
-
-    &:hover:not(:disabled) {
-      background-color: var(--color-primary-hover);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
   &-security {
     display: flex;
     align-items: flex-start;
@@ -565,8 +516,6 @@ const handleSubmit = async () => {
   }
 
   &-security-icon {
-    width: 20px;
-    height: 20px;
     color: var(--color-primary);
     flex-shrink: 0;
     margin-top: 2px;
@@ -624,8 +573,6 @@ const handleSubmit = async () => {
   }
 
   &-event-icon {
-    width: 20px;
-    height: 20px;
     color: var(--color-primary);
   }
 
@@ -719,28 +666,6 @@ const handleSubmit = async () => {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-foreground);
-  }
-
-  &-desktop-submit {
-    width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color var(--transition-base);
-
-    &:hover:not(:disabled) {
-      background-color: var(--color-primary-hover);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
   }
 }
 </style>

@@ -33,7 +33,7 @@ export interface CoreEventJson {
   isSoldOut: boolean
   lifecycleStatus: string
   promoterAgreementId: string
-  promoterProfileId: string | null
+  promoterProfileId: string
   buyerFeeMode: string | null
   ticketSaleOpensAt: string | null
   ticketSaleClosesAt: string | null
@@ -69,7 +69,7 @@ export function coreEventFromCoreApiAdapter(coreEventJson: CoreEventJson): CoreE
     coreEventJson.isSoldOut,
     coreEventJson.lifecycleStatus as CoreEventLifecycleStatus,
     Uuid.fromString(coreEventJson.promoterAgreementId),
-    coreEventJson.promoterProfileId ? Uuid.fromString(coreEventJson.promoterProfileId) : null,
+    Uuid.fromString(coreEventJson.promoterProfileId),
     coreEventJson.buyerFeeMode ? (coreEventJson.buyerFeeMode as BuyerFeeMode) : null,
     coreEventJson.ticketSaleOpensAt ? new Date(coreEventJson.ticketSaleOpensAt) : null,
     coreEventJson.ticketSaleClosesAt ? new Date(coreEventJson.ticketSaleClosesAt) : null,

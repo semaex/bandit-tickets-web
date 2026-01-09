@@ -9,14 +9,8 @@ export class TicketTypeView {
     public readonly name: StringMultilanguage | null,
     public readonly description: StringMultilanguage | null,
     public readonly price: Money | null,
-    public readonly salesStock: number | null,
-    public readonly invitationsStock: number,
     public readonly isPublished: boolean,
     public readonly isSoldOut: boolean,
-    public readonly enabledFrom: Date | null,
-    public readonly enabledTo: Date | null,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date
   ) {}
 }
 

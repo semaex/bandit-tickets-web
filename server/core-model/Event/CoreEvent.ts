@@ -33,7 +33,7 @@ export class CoreEvent {
     public readonly isSoldOut: boolean,
     public readonly lifecycleStatus: CoreEventLifecycleStatus,
     public readonly promoterAgreementId: Uuid,
-    public readonly promoterProfileId: Uuid | null,
+    public readonly promoterProfileId: Uuid,
     public readonly buyerFeeMode: BuyerFeeMode | null,
     public readonly ticketSaleOpensAt: Date | null,
     public readonly ticketSaleClosesAt: Date | null,

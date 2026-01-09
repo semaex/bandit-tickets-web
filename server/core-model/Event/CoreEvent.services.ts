@@ -5,6 +5,13 @@ import { coreApiClient } from '../../api-client/core'
 
 const BASE_URL = '/api/v1/catalog/events'
 
+export function findCoreEventById(id: string): Promise<CoreEvent> {
+  const endpoint = `${BASE_URL}/${id}`
+  return coreApiClient.get<CoreEventJson>(endpoint)
+      .then(response => coreEventFromCoreApiAdapter(response))
+}
+
+
 export function findCoreEventBySlug(slug: string): Promise<CoreEvent> {
   const endpoint = `${BASE_URL}/by-slug/${slug}`
   return coreApiClient.get<CoreEventJson>(endpoint)

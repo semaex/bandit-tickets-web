@@ -10,14 +10,8 @@ export interface TicketTypeViewJson {
   name: Record<string, string> | null
   description: Record<string, string> | null
   price: { amount: number; currency: string; formatted?: string } | null
-  salesStock: number | null
-  invitationsStock: number
   isPublished: boolean
   isSoldOut: boolean
-  enabledFrom: string | null
-  enabledTo: string | null
-  createdAt: string
-  updatedAt: string
 }
 
 export function ticketTypeViewFromJson(json: TicketTypeViewJson): TicketTypeView {
@@ -27,14 +21,8 @@ export function ticketTypeViewFromJson(json: TicketTypeViewJson): TicketTypeView
     json.name ? StringMultilanguage.fromArray(json.name) : null,
     json.description ? StringMultilanguage.fromArray(json.description) : null,
     json.price ? Money.fromArray(json.price) : null,
-    json.salesStock,
-    json.invitationsStock,
     json.isPublished,
     json.isSoldOut,
-    json.enabledFrom ? new Date(json.enabledFrom) : null,
-    json.enabledTo ? new Date(json.enabledTo) : null,
-    new Date(json.createdAt),
-    new Date(json.updatedAt)
   )
 }
 
@@ -45,14 +33,8 @@ export function ticketTypeViewToJson(ticketTypeView: TicketTypeView): TicketType
     name: ticketTypeView.name?.toArray() || null,
     description: ticketTypeView.description?.toArray() || null,
     price: ticketTypeView.price?.toArray() || null,
-    salesStock: ticketTypeView.salesStock,
-    invitationsStock: ticketTypeView.invitationsStock,
     isPublished: ticketTypeView.isPublished,
-    isSoldOut: ticketTypeView.isSoldOut,
-    enabledFrom: ticketTypeView.enabledFrom?.toISOString() || null,
-    enabledTo: ticketTypeView.enabledTo?.toISOString() || null,
-    createdAt: ticketTypeView.createdAt.toISOString(),
-    updatedAt: ticketTypeView.updatedAt.toISOString()
+    isSoldOut: ticketTypeView.isSoldOut
   }
 }
 
@@ -63,14 +45,7 @@ export function ticketTypeViewFromCoreTicketTypeAdapter(coreTicketType: CoreTick
       coreTicketType.name,
       coreTicketType.description,
       coreTicketType.price,
-      coreTicketType.salesStock,
-      coreTicketType.invitationsStock,
       coreTicketType.isPublished,
       coreTicketType.isSoldOut,
-      coreTicketType.enabledFrom,
-      coreTicketType.enabledTo,
-      coreTicketType.createdAt,
-      coreTicketType.updatedAt
     )
   }
-  
