@@ -7,7 +7,7 @@
         <p class="TicketCard-price">{{ formattedPrice }}</p>
       </div>
 
-      <div v-if="available" class="TicketCard-controls">
+      <div class="TicketCard-controls">
         <div class="TicketCard-quantity">
           <button
             class="TicketCard-button"
@@ -32,7 +32,6 @@
           </button>
         </div>
       </div>
-      <span v-else class="TicketCard-unavailable">{{ trans('ticketCard.sold_out') }}</span>
     </div>
   </div>
 </template>
@@ -40,7 +39,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
-import { Money } from '../../../model/Shared/Money'
+import { Money } from '../../../shared/Money'
 import ticketCardTranslations from './ticket-card.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
@@ -56,7 +55,6 @@ interface Props {
   price: Money
   quantity: number
   maxQuantity?: number
-  available: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -175,15 +173,6 @@ const handleIncrease = () => {
     text-align: center;
     font-weight: 600;
     color: var(--color-foreground);
-  }
-
-  &-unavailable {
-    font-size: 0.875rem;
-    color: var(--color-muted-foreground);
-    font-weight: 500;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-color: var(--color-secondary);
-    border-radius: var(--radius-lg);
   }
 }
 </style>

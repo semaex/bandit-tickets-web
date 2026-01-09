@@ -64,11 +64,6 @@
 
             <!-- Event Header Info -->
             <div class="EventPage-header">
-              <SaleStatus
-                v-if="event"
-                :status="event.saleStatus"
-                :close-date="eventTicketSaleClosesAt"
-              />
               <h1 class="EventPage-title">{{ event?.title.valueForLocaleOrAutoFallback(currentLocale) || '' }}</h1>
               <p v-if="event?.subtitle && !event.subtitle.isEmpty() && event.subtitle.valueForLocaleOrAutoFallback(currentLocale)" class="EventPage-subtitle">
                 {{ event.subtitle.valueForLocaleOrAutoFallback(currentLocale) }}
@@ -126,7 +121,6 @@
                     :description="getTicketDescription(ticketType)"
                     :price="ticketType.price!"
                     :quantity="quantities[ticketType.id.toString()] || 0"
-                    :available="ticketType.available"
                     @quantity-change="(qty: number) => handleQuantityChange(ticketType.id.toString(), qty)"
                   />
                 </div>
@@ -175,9 +169,9 @@
                       {{ paragraph }}
                     </p>
                   </div>
-                  <div v-if="minorsPolicyFile" class="EventPage-file-download">
+                  <div v-if="minorsPolicyFileView" class="EventPage-file-download">
                     <a
-                      :href="minorsPolicyFile.url.toString()"
+                      :href="minorsPolicyFileView.url.toString()"
                       target="_blank"
                       rel="noopener noreferrer"
                       class="EventPage-file-link"
@@ -287,27 +281,25 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import EventInfo from '../../common/EventInfo/EventInfo.vue'
-import SaleStatus from '../../common/SaleStatus/SaleStatus.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
 import GenreChip from '../../common/GenreChip/GenreChip.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
 import { useCheckout } from '../../../composables/useCheckout'
 import { useAppLanguage } from '../../../composables/useAppLanguage'
-import { findEventBySlug } from '../../../model/Event/Event.services'
-import type { Event as EventModel } from '../../../model/Event/Event'
-import { findVenueById } from '../../../model/Venue/Venue.services'
-import { findPromoterProfileById } from '../../../model/PromoterProfile/PromoterProfile.services'
-import { findTicketTypesByEvent } from '../../../model/TicketType/TicketType.services'
-import type { TicketType } from '../../../model/TicketType/TicketType'
-import { findFileById } from '../../../model/File/File.services'
-import type { File as FileModel } from '../../../model/File/File'
-import type { Venue } from '../../../model/Venue/Venue'
-import type { PromoterProfile } from '../../../model/PromoterProfile/PromoterProfile'
-import { StringMultilanguage } from '../../../model/Shared/StringMultilanguage'
-import { Locale } from '../../../model/Shared/Locale'
-import { Money } from '../../../model/Shared/Money'
-import { Currency } from '../../../model/Shared/Currency'
+import { findEventViewBySlug } from '../../../public-model/Event/EventView.services'
+import type { EventView } from '../../../public-model/Event/EventView'
+import { findVenueViewById } from '../../../public-model/Venue/VenueView.services'
+import { findPromoterProfileViewById } from '../../../public-model/PromoterProfile/PromoterProfile.services'
+import type { PromoterProfileView } from '../../../public-model/PromoterProfile/PromoterProfileView'
+import { findTicketTypeViewsByEvent } from '../../../public-model/TicketType/TicketTypeView.services'
+import type { TicketTypeView } from '../../../public-model/TicketType/TicketTypeView'
+import { findFileViewById } from '../../../public-model/File/FileView.services'
+import type { FileView } from '../../../public-model/File/FileView'
+import type { VenueView } from '../../../public-model/Venue/VenueView'
+import { Locale } from '../../../shared/Locale'
+import { Money } from '../../../shared/Money'
+import { Currency } from '../../../shared/Currency'
 import eventPageTranslations from './event-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
@@ -323,27 +315,27 @@ const { trans, appLanguage } = useAppLanguage()
 
 const loading = ref(true)
 const error = ref<string | null>(null)
-const event = ref<EventModel | null>(null)
-const venue = ref<Venue | null>(null)
-const promoterProfile = ref<PromoterProfile | null>(null)
-const ticketTypes = ref<TicketType[]>([])
-const minorsPolicyFile = ref<FileModel | null>(null)
+const event = ref<EventView | null>(null)
+const venueView = ref<VenueView | null>(null)
+const promoterProfileView = ref<PromoterProfileView | null>(null)
+const ticketTypeViews = ref<TicketTypeView[]>([])
+const minorsPolicyFileView = ref<FileView | null>(null)
 const currency = ref<Currency>(Currency.EUR)
 
 const currentLocale = computed(() => Locale.fromString(appLanguage.value))
 
-const getTicketName = (ticket: TicketType): string => {
+const getTicketName = (ticket: TicketTypeView): string => {
   if (!ticket.name || ticket.name.isEmpty()) return ''
   return ticket.name.valueForLocaleOrAutoFallback(currentLocale.value) || ''
 }
 
-const getTicketDescription = (ticket: TicketType): string => {
+const getTicketDescription = (ticket: TicketTypeView): string => {
   if (!ticket.description || ticket.description.isEmpty()) return ''
   return ticket.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
 }
 
 const publishedTicketTypes = computed(() => {
-  return ticketTypes.value.filter(tt => tt.isPublished) as TicketType[]
+  return ticketTypeViews.value.filter(tt => tt.isPublished) as TicketTypeView[]
 })
 
 
@@ -354,30 +346,30 @@ const eventDate = computed(() => {
 const eventTime = computed(() => {
   if (!event.value) return ''
   if (!event.value.startTime) return ''
-  const timeStr = formatTime(event.value.startTime as import('../../../model/Shared/Time').Time)
-  const doorsTime = event.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.value.doorsOpenTime as import('../../../model/Shared/Time').Time)})` : ''
+  const timeStr = formatTime(event.value.startTime as import('../../../shared/Time').Time)
+  const doorsTime = event.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(event.value.doorsOpenTime as import('../../../shared/Time').Time)})` : ''
   return `${timeStr}${doorsTime}`
 })
 
 const eventVenue = computed(() => {
-  return venue.value?.name || trans('eventPage.venue_to_confirm')
+  return venueView.value?.name || trans('eventPage.venue_to_confirm')
 })
 
 const eventCity = computed(() => {
-  return venue.value?.city || (venue.value?.countryCode ? venue.value.countryCode.toString() : (event.value?.countryCode ? event.value.countryCode.toString() : ''))
+  return venueView.value?.city || (venueView.value?.countryCode ? venueView.value.countryCode.toString() : (event.value?.countryCode ? event.value.countryCode.toString() : ''))
 })
 
 const eventVenueAddress = computed(() => {
-  return venue.value?.address || undefined
+  return venueView.value?.address || undefined
 })
 
 const eventVenueGoogleMapsUrl = computed(() => {
-  if (!venue.value?.coords) return undefined
-  return `https://www.google.com/maps?q=${venue.value.coords.latitude()},${venue.value.coords.longitude()}`
+  if (!venueView.value?.coords) return undefined
+  return `https://www.google.com/maps?q=${venueView.value.coords.latitude()},${venueView.value.coords.longitude()}`
 })
 
 const eventPromoter = computed(() => {
-  return promoterProfile.value?.brandName || (event.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : (event.value?.promoterId ? event.value.promoterId.toString() : ''))
+  return promoterProfileView.value?.brandName || (event.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : '')
 })
 
 const eventTicketSaleClosesAt = computed(() => {
@@ -425,7 +417,7 @@ const formatDate = (date: Date | null): string => {
   }
 }
 
-const formatTime = (time: import('../../../model/Shared/Time').Time | null): string => {
+const formatTime = (time: import('../../../shared/Time').Time | null): string => {
   if (!time) return ''
   return time.toShortString() + 'h'
 }
@@ -450,13 +442,10 @@ const loadEvent = async () => {
   error.value = null
   
   try {
-    const eventModel = await findEventBySlug(props.slug)
+    const eventModel = await findEventViewBySlug(props.slug)
     
     const venueName = trans('eventPage.venue_to_confirm')
     const venueCity = eventModel.countryCode ? eventModel.countryCode.toString() : ''
-    const organizerName = eventModel.promoterProfileId 
-      ? trans('eventPage.organizer_to_confirm')
-      : eventModel.promoterId.toString()
     
     event.value = eventModel
     
@@ -474,14 +463,14 @@ const loadEvent = async () => {
   }
 }
 
-const loadVenueAndOrganizer = async (eventModel: EventModel) => {
+const loadVenueAndOrganizer = async (eventModel: EventView) => {
   const promises: Promise<void>[] = []
   
   if (eventModel.venueId) {
     promises.push(
-      findVenueById(eventModel.venueId.toString())
+      findVenueViewById(eventModel.venueId.toString())
         .then((venueData) => {
-          venue.value = venueData
+          venueView.value = venueData
         })
         .catch((venueErr) => {
           console.warn('Error loading venue:', venueErr)
@@ -491,11 +480,11 @@ const loadVenueAndOrganizer = async (eventModel: EventModel) => {
 
   if (eventModel.promoterProfileId) {
     promises.push(
-      findPromoterProfileById(eventModel.promoterProfileId.toString())
-        .then((profileData) => {
-          promoterProfile.value = profileData
+      findPromoterProfileViewById(eventModel.promoterProfileId.toString())
+        .then((profileData: PromoterProfileView) => {
+          promoterProfileView.value = profileData
         })
-        .catch((profileErr) => {
+        .catch((profileErr: any) => {
           console.warn('Error loading promoter profile:', profileErr)
         })
     )
@@ -506,8 +495,8 @@ const loadVenueAndOrganizer = async (eventModel: EventModel) => {
 
 const loadMinorsPolicyFile = async (fileId: string) => {
   try {
-    const file = await findFileById(fileId)
-    minorsPolicyFile.value = file
+    const file = await findFileViewById(fileId)
+    minorsPolicyFileView.value = file
   } catch (err) {
     console.warn('Error loading minors policy file:', err)
   }
@@ -515,11 +504,11 @@ const loadMinorsPolicyFile = async (fileId: string) => {
 
 const loadTicketTypes = async (eventId: string) => {
   try {
-    const loadedTicketTypes = await findTicketTypesByEvent(eventId)
-    ticketTypes.value = loadedTicketTypes
+    const loadedTicketTypes = await findTicketTypeViewsByEvent(eventId)
+    ticketTypeViews.value = loadedTicketTypes
     
-    const published = loadedTicketTypes.filter(tt => tt.isPublished)
-    const firstTicketTypeWithPrice = published.find(tt => tt.price !== null)
+    const published = loadedTicketTypes.filter((tt: TicketTypeView) => tt.isPublished)
+    const firstTicketTypeWithPrice = published.find((tt: TicketTypeView) => tt.price !== null)
     
     if (!firstTicketTypeWithPrice || !firstTicketTypeWithPrice.price) {
       throw new Error('No ticket type with price found')
@@ -528,7 +517,7 @@ const loadTicketTypes = async (eventId: string) => {
     currency.value = firstTicketTypeWithPrice.price.currency()
     
     const initialQuantities: Record<string, number> = {}
-    published.forEach(ticketType => {
+    published.forEach((ticketType: TicketTypeView) => {
       initialQuantities[ticketType.id.toString()] = 0
     })
     quantities.value = initialQuantities
@@ -583,7 +572,7 @@ const selectedTicketTypes = computed(() => {
 })
 
 const isOnSale = computed(() => {
-  return event.value?.saleStatus === 'on-sale'
+  return true
 })
 
 const minPrice = computed(() => {
@@ -601,12 +590,12 @@ const minPrice = computed(() => {
 })
 
 const descriptionParagraphs = computed(() => {
-  return (eventDescription.value ?? '').split('\n\n').filter((p) => p.trim())
+  return (eventDescription.value ?? '').split('\n\n').filter((p: string) => p.trim())
 })
 
 const minorsPolicyParagraphs = computed(() => {
   if (!eventMinorsPolicyDescription.value) return []
-  return eventMinorsPolicyDescription.value.split('\n\n').filter((p) => p.trim())
+  return eventMinorsPolicyDescription.value.split('\n\n').filter((p: string) => p.trim())
 })
 
 const handleQuantityChange = (ticketId: string, quantity: number) => {
