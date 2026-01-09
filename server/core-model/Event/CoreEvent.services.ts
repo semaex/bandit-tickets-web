@@ -7,6 +7,6 @@ const BASE_URL = '/api/v1/catalog/events'
 
 export function findCoreEventBySlug(slug: string): Promise<CoreEvent> {
   const endpoint = `${BASE_URL}/by-slug/${slug}`
-  return coreApiClient.get<{ event: CoreEventJson }>(endpoint)
-    .then(response => coreEventFromCoreApiAdapter(response.event))
+  return coreApiClient.get<CoreEventJson>(endpoint)
+    .then(response => coreEventFromCoreApiAdapter(response))
 }

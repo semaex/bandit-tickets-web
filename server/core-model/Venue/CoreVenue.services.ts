@@ -7,6 +7,6 @@ const BASE_URL = '/api/v1/catalog/venues'
 
 export function findCoreVenueById(id: string): Promise<CoreVenue> {
   const endpoint = `${BASE_URL}/${id}`
-  return coreApiClient.get<{ venue: CoreVenueJson }>(endpoint)
-    .then(response => coreVenueFromCoreApiAdapter(response.venue))
+  return coreApiClient.get<CoreVenueJson >(endpoint)
+    .then(response => coreVenueFromCoreApiAdapter(response))
 }

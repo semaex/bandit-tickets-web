@@ -1,17 +1,14 @@
-import { corePromoterProfileFromJson, type CorePromoterProfileJson } from '../../core-model/PromoterProfile/CorePromoterProfile.adapter'
 import { promoterProfileViewFromCorePromoterProfileAdapter, promoterProfileViewToJson } from '../../../public-model/PromoterProfile/PromoterProfileView.adapter'
-import { coreApiClient, handleCoreApiCall } from '../../api-client/core'
+import { handleCoreApiCall } from '../../api-client/core'
 import { getRouterParamOrFail } from '../../utils/params'
-
-const BASE_URL = '/api/v1/catalog/promoter-profiles'
+import { findCorePromoterProfileById } from "../../core-model/PromoterProfile/CorePromoterProfile.services"
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParamOrFail(event, 'id')
+  const promoterProfileId = getRouterParamOrFail(event, 'promoterProfileId')
 
   return handleCoreApiCall(async () => {
-    const response = await coreApiClient.get<{ promoterProfile: CorePromoterProfileJson }>(`${BASE_URL}/${id}`)
-
-    const corePromoterProfile = corePromoterProfileFromJson(response.promoterProfile)
+    
+    const corePromoterProfile = await findCorePromoterProfileById(promoterProfileId)
     const promoterProfileView = promoterProfileViewFromCorePromoterProfileAdapter(corePromoterProfile)
     return promoterProfileViewToJson(promoterProfileView)
   }, 'fetch promoter profile from core')
