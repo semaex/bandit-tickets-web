@@ -2,22 +2,37 @@
   <span class="GenreChip">{{ translatedGenre }}</span>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useAppLocale } from '../../../composables/useAppLocale'
 
-const { trans } = useAppLanguage()
+export default defineComponent({
+  name: 'GenreChip',
 
-interface Props {
-  genre: string
-}
+  props: {
+    genre: {
+      type: String,
+      required: true
+    }
+  },
 
-const props = defineProps<Props>()
+  data () {
+    const { trans } = useAppLocale()
 
-const translatedGenre = computed(() => {
-  const genreKey = props.genre.toLowerCase().replace(/\s+/g, '_')
-  const translation = trans(`musicGenres.${genreKey}`)
-  return translation !== `musicGenres.${genreKey}` ? translation : props.genre
+    return {
+      trans
+    }
+  },
+
+  computed: {
+    translatedGenre (): string {
+      const genreKey = this.genre.toLowerCase().replace(/\s+/g, '_')
+      const translation = this.trans(`musicGenres.${genreKey}`)
+      return translation !== `musicGenres.${genreKey}`
+        ? translation
+        : this.genre
+    }
+  }
 })
 </script>
 
@@ -40,4 +55,3 @@ const translatedGenre = computed(() => {
   }
 }
 </style>
-

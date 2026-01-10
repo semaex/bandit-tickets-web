@@ -169,20 +169,15 @@
   </MicrositeLayout>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script lang="ts">
+import { defineComponent } from 'vue'
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import { useCheckout } from '../../../composables/useCheckout'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+import { useAppLocale } from '../../../composables/useAppLocale'
 import paymentResultPageTranslations from './payment-result-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
-// Load translations
 translationService.addTranslations('paymentResultPage', paymentResultPageTranslations)
-
-// Use translation composable
-const { trans } = useAppLanguage()
 
 interface PaymentData {
   success: boolean
@@ -194,26 +189,44 @@ interface PaymentData {
   email?: string
 }
 
-const router = useRouter()
-const { getPaymentData, getCheckoutData } = useCheckout()
+export default defineComponent({
+  name: 'PaymentResultPage',
 
-const paymentData = ref<PaymentData | null>(null)
+  components: {
+    MicrositeLayout
+  },
 
-onMounted(() => {
-  paymentData.value = getPaymentData()
+  data () {
+    const { trans } = useAppLocale()
+    const checkout = useCheckout()
+
+    return {
+      trans,
+      checkout,
+      paymentData: null as PaymentData | null
+    }
+  },
+
+  computed: {
+    isSuccess (): boolean {
+      return this.paymentData?.success ?? false
+    }
+  },
+
+  mounted () {
+    this.paymentData = this.checkout.getPaymentData()
+  },
+
+  methods: {
+    handleBack () {
+      this.$router.push('/event')
+    },
+
+    handleRetry () {
+      this.$router.push('/checkout')
+    }
+  }
 })
-
-const isSuccess = computed(() => {
-  return paymentData.value?.success ?? false
-})
-
-const handleBack = () => {
-  router.push('/event')
-}
-
-const handleRetry = () => {
-  router.push('/checkout')
-}
 </script>
 
 <style lang="scss">

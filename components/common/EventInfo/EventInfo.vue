@@ -16,10 +16,12 @@
         <span class="EventInfo-text EventInfo-text--bold">{{ venue }}</span>
         <span class="EventInfo-separator"> · </span>
         <span class="EventInfo-text EventInfo-text--muted">{{ city }}</span>
+
         <template v-if="venueAddress">
           <span class="EventInfo-separator"> · </span>
           <span class="EventInfo-text EventInfo-text--muted EventInfo-text--small">{{ venueAddress }}</span>
         </template>
+
         <template v-if="venueGoogleMapsUrl">
           <span class="EventInfo-separator"> · </span>
           <a 
@@ -43,29 +45,40 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useAppLocale } from '../../../composables/useAppLocale'
 import eventInfoTranslations from './event-info.i18n.json'
 import { translationService } from '../../../services/translation.service'
 import Icon from '../../ui/icon/Icon.vue'
 
-// Load translations
 translationService.addTranslations('eventInfo', eventInfoTranslations)
 
-// Use translation composable
-const { trans } = useAppLanguage()
+export default defineComponent({
+  name: 'EventInfo',
 
-interface Props {
-  date: string
-  time: string
-  venue: string
-  city: string
-  venueAddress?: string
-  venueGoogleMapsUrl?: string
-  promoter: string
-}
+  components: {
+    Icon
+  },
 
-defineProps<Props>()
+  props: {
+    date: { type: String, required: true },
+    time: { type: String, required: true },
+    venue: { type: String, required: true },
+    city: { type: String, required: true },
+    venueAddress: { type: String, required: false, default: undefined },
+    venueGoogleMapsUrl: { type: String, required: false, default: undefined },
+    promoter: { type: String, required: true }
+  },
+
+  data () {
+    const { trans } = useAppLocale()
+
+    return {
+      trans
+    }
+  }
+})
 </script>
 
 <style lang="scss">
@@ -131,4 +144,3 @@ defineProps<Props>()
   }
 }
 </style>
-

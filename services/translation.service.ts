@@ -1,14 +1,9 @@
 import generalTranslations from '../i18n/general.i18n.json'
 import musicGenresTranslations from '../i18n/music-genres.i18n.json'
-import { appLanguages } from '../i18n/languages'
+import { type AppLocale, appLocales } from '../i18n/locales'
 
 interface Translations {
-  [language: string]: Record<string, any>
-}
-
-interface Language {
-  code: string
-  name: string
+  [locale: string]: Record<string, any>
 }
 
 class TranslationService {
@@ -21,19 +16,19 @@ class TranslationService {
   }
 
   /**
-   * Get current language from state
+   * Get current locale from state
    */
-  private getCurrentLanguage(): string {
-    const appLanguage = useState<string>('appLanguage', () => 'es-ES')
-    return appLanguage.value || 'es-ES'
+  private getCurrentLocale(): AppLocale {
+    const appLocale = useState<AppLocale>('appLocale', () => 'es-ES')
+    return appLocale.value || 'es-ES'
   }
 
   /**
-   * Set current language
+   * Set current locale
    */
-  setLanguage(language: string): void {
-    const appLanguage = useState<string>('appLanguage', () => 'es-ES')
-    appLanguage.value = language
+  setLocale(locale: AppLocale): void {
+    const appLocale = useState<AppLocale>('appLocale', () => 'es-ES')
+    appLocale.value = locale
   }
 
   /**
@@ -42,16 +37,15 @@ class TranslationService {
    * if there is not translation, returns last segment
    * @param key
    * @param variables
-   * @param language
+   * @param locale
    * @returns string
    */
-  translate(key: string, variables?: Record<string, string>, language?: string): string {
+  translate(key: string, variables?: Record<string, string>, locale?: string): string {
     const keys = key.split('.')
     let result: any
 
     if (keys) {
-      const lang = language || this.getCurrentLanguage()
-      result = this.translations[lang]
+      result = this.translations[locale || this.getCurrentLocale()]
       
       for (let i = 0; i < keys.length; i++) {
         if (result && result.hasOwnProperty(keys[i])) {
@@ -86,14 +80,14 @@ class TranslationService {
    * @param translations
    */
   addTranslations(domain: string, translations: Record<string, any>): void {
-    for (const lang in translations) {
-      if (!this.translations.hasOwnProperty(lang)) {
-        this.translations[lang] = {}
+    for (const locale in translations) {
+      if (!this.translations.hasOwnProperty(locale)) {
+        this.translations[locale] = {}
       }
 
       const keyPath = domain.split('.')
       const lastKeyIndex = keyPath.length - 1
-      let obj: any = this.translations[lang]
+      let obj: any = this.translations[locale]
 
       for (let i = 0; i < lastKeyIndex; ++i) {
         const key = keyPath[i]
@@ -102,29 +96,8 @@ class TranslationService {
         }
         obj = obj[key]
       }
-      obj[keyPath[lastKeyIndex]] = translations[lang]
+      obj[keyPath[lastKeyIndex]] = translations[locale]
     }
-  }
-
-  languages(currentLanguage: string): Language[] {
-    const languages: Language[] = []
-    
-    appLanguages.forEach((language) => {
-      languages.push({
-        code: language,
-        name: this.translate('general.language.' + language, undefined, currentLanguage)
-      })
-    })
-
-    return languages.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1
-      }
-      if (a.name > b.name) {
-        return 1
-      }
-      return 0
-    })
   }
 }
 

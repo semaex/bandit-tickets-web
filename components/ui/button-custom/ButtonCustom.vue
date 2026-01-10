@@ -25,77 +25,119 @@
   </component>
 </template>
 
-<script setup lang="ts">
-import { computed, useSlots } from 'vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
 
-interface Props {
-  type?: 'default' | 'primary' | 'secondary' | 'transparent'
-  to?: string | object
-  disabled?: boolean
-  active?: boolean
-  loading?: boolean
-  icon?: string
-  size?: 'xs' | 'sm' | 'xl'
-  title?: string
-  dropdown?: boolean
-  readonly?: boolean
-  href?: string
-  target?: string
-  tag?: string
-  hideContentOnMobile?: boolean
-  fullWidth?: boolean
-}
+export default defineComponent({
+  name: 'ButtonCustom',
 
-const props = withDefaults(defineProps<Props>(), {
-  type: 'default',
-  hideContentOnMobile: false,
-  fullWidth: false
-})
+  props: {
+    type: {
+      type: String as () => 'default' | 'primary' | 'secondary' | 'transparent',
+      default: 'default'
+    },
+    to: {
+      type: [String, Object],
+      default: undefined
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    active: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
+      type: String,
+      default: undefined
+    },
+    size: {
+      type: String as () => 'xs' | 'sm' | 'xl' | undefined,
+      default: undefined
+    },
+    title: {
+      type: String,
+      default: undefined
+    },
+    dropdown: {
+      type: Boolean,
+      default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    href: {
+      type: String,
+      default: undefined
+    },
+    target: {
+      type: String,
+      default: undefined
+    },
+    tag: {
+      type: String,
+      default: undefined
+    },
+    hideContentOnMobile: {
+      type: Boolean,
+      default: false
+    },
+    fullWidth: {
+      type: Boolean,
+      default: false
+    }
+  },
 
-defineEmits<{
-  click: [event: Event]
-}>()
+  emits: ['click'],
 
-const slots = useSlots()
+  computed: {
+    componentType (): string {
+      if (this.tag) {
+        return this.tag
+      }
+      if (this.href) {
+        return 'a'
+      }
+      if (this.to) {
+        return 'router-link'
+      }
+      return 'button'
+    },
 
-const componentType = computed(() => {
-  if (props.tag) {
-    return props.tag
+    buttonType (): string | undefined {
+      return this.componentType === 'button' ? 'button' : undefined
+    },
+
+    classes (): Record<string, boolean> {
+      return {
+        ButtonCustom: true,
+        'ButtonCustom--default': !this.type || this.type === 'default',
+        'ButtonCustom--primary': this.type === 'primary',
+        'ButtonCustom--secondary': this.type === 'secondary',
+        'ButtonCustom--transparent': this.type === 'transparent',
+        'ButtonCustom--active': this.active,
+        'ButtonCustom--xs': this.size === 'xs',
+        'ButtonCustom--sm': this.size === 'sm',
+        'ButtonCustom--xl': this.size === 'xl',
+        'ButtonCustom--loading': this.loading,
+        'ButtonCustom--hideContentOnMobile': this.hideContentOnMobile,
+        'ButtonCustom--fullWidth': this.fullWidth
+      }
+    },
+
+    hasSlot (): boolean {
+      return !!this.$slots.default
+    }
   }
-  if (props.href) {
-    return 'a'
-  }
-  if (props.to) {
-    return 'router-link'
-  }
-  return 'button'
-})
-
-const buttonType = computed(() => {
-  return componentType.value === 'button' ? 'button' : undefined
-})
-
-const classes = computed(() => {
-  return {
-    'ButtonCustom': true,
-    'ButtonCustom--default': !props.type || props.type === 'default',
-    'ButtonCustom--primary': props.type === 'primary',
-    'ButtonCustom--secondary': props.type === 'secondary',
-    'ButtonCustom--active': props.active,
-    'ButtonCustom--transparent': props.type === 'transparent',
-    'ButtonCustom--xs': props.size === 'xs',
-    'ButtonCustom--sm': props.size === 'sm',
-    'ButtonCustom--xl': props.size === 'xl',
-    'ButtonCustom--loading': props.loading,
-    'ButtonCustom--hideContentOnMobile': props.hideContentOnMobile,
-    'ButtonCustom--fullWidth': props.fullWidth
-  }
-})
-
-const hasSlot = computed(() => {
-  return !!slots.default?.()
 })
 </script>
+
 
 <style lang="scss">
 :root {

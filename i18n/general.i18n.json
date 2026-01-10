@@ -1,5 +1,6 @@
 {
   "es-ES": {
+    "Loading": "Cargando",
     "language": {
       "en-GB": "Inglés",
       "es-ES": "Español",
@@ -9,6 +10,7 @@
     }
   },
   "en-GB": {
+    "Loading": "Loading",
     "language": {
       "en-GB": "English",
       "es-ES": "Spanish",
@@ -18,6 +20,7 @@
     }
   },
   "ca-ES": {
+    "Loading": "Carregant",
     "language": {
       "en-GB": "Anglès",
       "es-ES": "Espanyol",
@@ -27,6 +30,7 @@
     }
   },
   "eu-ES": {
+    "Loading": "Kargatzen",
     "language": {
       "en-GB": "Ingelesa",
       "es-ES": "Gaztelania",
@@ -36,6 +40,7 @@
     }
   },
   "gl-ES": {
+    "Loading": "Cargando",
     "language": {
       "en-GB": "Inglés",
       "es-ES": "Español",

@@ -9,56 +9,60 @@
   </span>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { iconMap } from './iconMap'
 
-interface Props {
-  name: string
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  color?: string
-  clickable?: boolean
-}
+export default defineComponent({
+  name: 'Icon',
 
-const props = withDefaults(defineProps<Props>(), {
-  size: 'md',
-  clickable: false
+  props: {
+    name: { type: String, required: true },
+    size: {
+      type: String as () => 'xs' | 'sm' | 'md' | 'lg' | 'xl',
+      default: 'md'
+    },
+    color: { type: String, default: undefined },
+    clickable: { type: Boolean, default: false }
+  },
+
+  emits: ['click'],
+
+  computed: {
+    iconStyle (): Record<string, string> {
+      const style: Record<string, string> = {}
+      if (this.color) {
+        style.color = this.color
+      }
+      return style
+    },
+
+    svgContent (): string {
+      const rawSvg = (iconMap as Record<string, string>)[this.name]
+
+      if (!rawSvg) {
+        console.warn(`Icon "${this.name}" not found in iconMap`)
+        return ''
+      }
+
+      let svgText = rawSvg
+
+      if (this.color) {
+        svgText = svgText.replace(/stroke="[^"]*"/g, `stroke="${this.color}"`)
+      }
+
+      return svgText
+    }
+  },
+
+  methods: {
+    handleClick (event: MouseEvent) {
+      if (this.clickable) {
+        this.$emit('click', event)
+      }
+    }
+  }
 })
-
-const emit = defineEmits<{
-  click: [event: MouseEvent]
-}>()
-
-const iconStyle = computed(() => {
-  const style: Record<string, string> = {}
-  if (props.color) {
-    style.color = props.color
-  }
-  return style
-})
-
-const svgContent = computed(() => {
-  const rawSvg = iconMap[props.name]
-  
-  if (!rawSvg) {
-    console.warn(`Icon "${props.name}" not found in iconMap`)
-    return ''
-  }
-  
-  let svgText = rawSvg
-  
-  if (props.color) {
-    svgText = svgText.replace(/stroke="[^"]*"/g, `stroke="${props.color}"`)
-  }
-  
-  return svgText
-})
-
-const handleClick = (event: MouseEvent) => {
-  if (props.clickable) {
-    emit('click', event)
-  }
-}
 </script>
 
 <style lang="scss">

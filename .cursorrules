@@ -6,8 +6,8 @@
 - When referencing components in templates, use PascalCase (e.g., `<HomePage />`, `<MicrositeLayout />`)
 
 ## Vue/Nuxt Best Practices
-- Use `<script setup lang="ts">` for all Vue components
-- Prefer Composition API over Options API
+- Use Options API for all Vue components (avoid Composition API and `<script setup>`)
+- Use `<script>` tag with `export default` and Options API syntax
 - Use TypeScript for type safety
 - Follow Nuxt 3 conventions for auto-imports (components, composables, utils)
 

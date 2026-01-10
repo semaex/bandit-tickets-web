@@ -193,83 +193,110 @@
   </MicrositeLayout>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script lang="ts">
+import { defineComponent } from 'vue'
+
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
+
 import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+import { useAppLocale } from '../../../composables/useAppLocale'
+
 import checkoutPageTranslations from './checkout-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
-// Load translations
+// Load translations (una vez)
 translationService.addTranslations('checkoutPage', checkoutPageTranslations)
 
-// Use translation composable
-const { trans } = useAppLanguage()
+export default defineComponent({
+  name: 'CheckoutPage',
 
-const router = useRouter()
-const { getCheckoutData, setCheckoutData } = useCheckout()
+  components: {
+    MicrositeLayout,
+    ButtonCustom,
+    Icon
+  },
 
-const checkoutData = ref<CheckoutData | null>(null)
+  data () {
+    const { trans } = useAppLocale()
+    const checkout = useCheckout()
 
-onMounted(() => {
-  checkoutData.value = getCheckoutData()
+    return {
+      // i18n
+      trans,
+
+      // composable (para no llamarlo 3 veces)
+      checkout,
+
+      // state
+      checkoutData: null as CheckoutData | null,
+
+      formData: {
+        email: '',
+        name: ''
+      },
+
+      acceptTerms: false,
+      isSubmitting: false
+    }
+  },
+
+  mounted () {
+    this.checkoutData = this.checkout.getCheckoutData()
+  },
+
+  methods: {
+    handleBack () {
+      const eventSlug = this.checkoutData?.eventSlug
+      if (eventSlug) {
+        this.$router.push(`/event/${eventSlug}`)
+      } else {
+        this.$router.push('/')
+      }
+    },
+
+    async handleSubmit () {
+      if (!this.formData.email || !this.formData.name) {
+        alert(this.trans('checkoutPage.alert_complete_fields'))
+        return
+      }
+
+      if (!this.acceptTerms) {
+        alert(this.trans('checkoutPage.alert_accept_terms'))
+        return
+      }
+
+      if (!this.checkoutData || this.checkoutData.items.length === 0) {
+        alert(this.trans('checkoutPage.empty_title'))
+        return
+      }
+
+      this.isSubmitting = true
+
+      // Simulate payment processing
+      setTimeout(() => {
+        // importante: tu composable tiene setPaymentData (lo usabas antes)
+        const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`
+
+        this.checkout.setPaymentData({
+          success: true,
+          orderNumber,
+          eventTitle: this.checkoutData?.eventTitle,
+          eventDate: this.checkoutData?.eventDate,
+          eventVenue: this.checkoutData?.eventVenue,
+          items: this.checkoutData?.items.map((item: any) => ({
+            name: item.name,
+            quantity: item.quantity
+          })),
+          email: this.formData.email
+        })
+
+        this.$router.push('/payment-result')
+      }, 1500)
+    }
+  }
 })
-
-const formData = ref({
-  email: '',
-  name: ''
-})
-
-const acceptTerms = ref(false)
-const isSubmitting = ref(false)
-
-const handleBack = () => {
-  const eventSlug = checkoutData.value?.eventSlug
-  if (eventSlug) {
-    router.push(`/event/${eventSlug}`)
-  } else {
-    router.push('/')
-  }
-}
-
-const handleSubmit = async () => {
-  if (!formData.value.email || !formData.value.name) {
-    alert(trans('checkoutPage.alert_complete_fields'))
-    return
-  }
-
-  if (!acceptTerms.value) {
-    alert(trans('checkoutPage.alert_accept_terms'))
-    return
-  }
-
-  isSubmitting.value = true
-
-  // Simulate payment processing
-  setTimeout(() => {
-    const { setPaymentData } = useCheckout()
-    const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`
-
-    setPaymentData({
-      success: true,
-      orderNumber,
-      eventTitle: checkoutData.value?.eventTitle,
-      eventDate: checkoutData.value?.eventDate,
-      eventVenue: checkoutData.value?.eventVenue,
-      items: checkoutData.value?.items.map((item: any) => ({
-        name: item.name,
-        quantity: item.quantity
-      })),
-      email: formData.value.email
-    })
-
-    router.push('/payment-result')
-  }, 1500)
-}
 </script>
 
 <style lang="scss">
@@ -669,4 +696,3 @@ const handleSubmit = async () => {
   }
 }
 </style>
-

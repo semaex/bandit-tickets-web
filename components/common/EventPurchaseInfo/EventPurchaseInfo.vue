@@ -2,9 +2,12 @@
   <div class="EventPurchaseInfo">
     <!-- Customer Service Info -->
     <section class="EventPurchaseInfo-section">
-      <h3 class="EventPurchaseInfo-title">{{ trans('eventPurchaseInfo.support_info_title') }}</h3>
+      <h3 class="EventPurchaseInfo-title">
+        {{ trans('eventPurchaseInfo.support_info_title') }}
+      </h3>
+
       <p class="EventPurchaseInfo-text">
-        <template v-if="buyerSupportView.responsible === BuyerSupportResponsibility.PROMOTER">
+        <template v-if="typedBuyerSupportView.responsible === BuyerSupportResponsibility.PROMOTER">
           {{ supportInfoPromoterText }}
         </template>
         <template v-else>
@@ -15,10 +18,14 @@
 
     <!-- Billing Info -->
     <section class="EventPurchaseInfo-section">
-      <h3 class="EventPurchaseInfo-title">{{ trans('eventPurchaseInfo.billing_info_title') }}</h3>
+      <h3 class="EventPurchaseInfo-title">
+        {{ trans('eventPurchaseInfo.billing_info_title') }}
+      </h3>
+
       <p class="EventPurchaseInfo-text">
         {{ trans('eventPurchaseInfo.billing_info_text') }}
       </p>
+
       <p class="EventPurchaseInfo-text EventPurchaseInfo-text--small">
         {{ trans('eventPurchaseInfo.ticket_amount_includes_taxes') }}
       </p>
@@ -26,41 +33,61 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useAppLocale } from '../../../composables/useAppLocale'
 import eventPurchaseInfoTranslations from './event-purchase-info.i18n.json'
 import { translationService } from '../../../services/translation.service'
 import type { EventBuyerSupportView } from '../../../public-model/Event/EventBuyerSupportView'
 import { BuyerSupportResponsibility } from '../../../shared/BuyerSupportResponsibility'
 
-// Load translations
-translationService.addTranslations('eventPurchaseInfo', eventPurchaseInfoTranslations)
+// Load translations (una vez al importar el componente)
+translationService.addTranslations(
+  'eventPurchaseInfo',
+  eventPurchaseInfoTranslations
+)
 
-// Use translation composable
-const { trans } = useAppLanguage()
+export default defineComponent({
+  name: 'EventPurchaseInfo',
 
-const props = defineProps({
-  buyerSupportView: {
-    type: Object,
-    required: true
+  props: {
+    buyerSupportView: {
+      type: Object,
+      required: true
+    } as { type: typeof Object; required: true }
+  },
+
+  data () {
+    const { trans } = useAppLocale()
+
+    return {
+      trans,
+      BuyerSupportResponsibility
+    }
+  },
+
+  computed: {
+    typedBuyerSupportView (): EventBuyerSupportView {
+      return this.buyerSupportView as EventBuyerSupportView
+    },
+
+    supportContactInfo (): string {
+      const view = this.typedBuyerSupportView
+      return view.email
+        ? view.email.toString()
+        : view.name
+    },
+
+    supportInfoPromoterText (): string {
+      return this.trans('eventPurchaseInfo.support_info_promoter_case')
+        .replace('%s', this.supportContactInfo)
+    },
+
+    supportInfoBanditText (): string {
+      return this.trans('eventPurchaseInfo.support_info_bandit_case')
+        .replace('%s', this.supportContactInfo)
+    }
   }
-})
-
-const buyerSupportView = computed(() => props.buyerSupportView as EventBuyerSupportView)
-
-const supportInfoPromoterText = computed(() => {
-  const contactInfo = buyerSupportView.value.email 
-    ? buyerSupportView.value.email.toString() 
-    : buyerSupportView.value.name
-  return trans('eventPurchaseInfo.support_info_promoter_case').replace('%s', contactInfo)
-})
-
-const supportInfoBanditText = computed(() => {
-  const contactInfo = buyerSupportView.value.email 
-    ? buyerSupportView.value.email.toString() 
-    : buyerSupportView.value.name
-  return trans('eventPurchaseInfo.support_info_bandit_case').replace('%s', contactInfo)
 })
 </script>
 
@@ -95,4 +122,3 @@ const supportInfoBanditText = computed(() => {
   }
 }
 </style>
-

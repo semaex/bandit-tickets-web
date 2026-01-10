@@ -19,7 +19,9 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
             </svg>
           </button>
+
           <span class="TicketCard-quantity-value">{{ quantity }}</span>
+
           <button
             class="TicketCard-button"
             :disabled="quantity >= maxQuantity"
@@ -36,50 +38,56 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useAppLocale } from '../../../composables/useAppLocale'
 import { Money } from '../../../shared/Money'
 import ticketCardTranslations from './ticket-card.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
-// Load translations
 translationService.addTranslations('ticketCard', ticketCardTranslations)
 
-// Use translation composable
-const { trans } = useAppLanguage()
+export default defineComponent({
+  name: 'TicketCard',
 
-interface Props {
-  name: string
-  description?: string
-  price: Money
-  quantity: number
-  maxQuantity?: number
-}
+  props: {
+    name: { type: String, required: true },
+    description: { type: String, required: false, default: undefined },
+    price: { type: Object as () => Money, required: true },
+    quantity: { type: Number, required: true },
+    maxQuantity: { type: Number, required: false, default: 10 }
+  },
 
-const props = withDefaults(defineProps<Props>(), {
-  maxQuantity: 10
-})
+  emits: ['quantity-change'],
 
-const emit = defineEmits<{
-  'quantity-change': [quantity: number]
-}>()
+  data () {
+    const { trans } = useAppLocale()
 
-const formattedPrice = computed(() => {
-  return props.price.formatted()
-})
+    return {
+      trans
+    }
+  },
 
-const handleDecrease = () => {
-  if (props.quantity > 0) {
-    emit('quantity-change', props.quantity - 1)
+  computed: {
+    formattedPrice (): string {
+      return this.price.formatted()
+    }
+  },
+
+  methods: {
+    handleDecrease () {
+      if (this.quantity > 0) {
+        this.$emit('quantity-change', this.quantity - 1)
+      }
+    },
+
+    handleIncrease () {
+      if (this.quantity < this.maxQuantity) {
+        this.$emit('quantity-change', this.quantity + 1)
+      }
+    }
   }
-}
-
-const handleIncrease = () => {
-  if (props.quantity < props.maxQuantity) {
-    emit('quantity-change', props.quantity + 1)
-  }
-}
+})
 </script>
 
 <style lang="scss">
@@ -176,4 +184,3 @@ const handleIncrease = () => {
   }
 }
 </style>
-

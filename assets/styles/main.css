@@ -7,6 +7,7 @@
 :root {
   /* Colors */
   --color-primary: rgb(62, 157, 215);
+  --color-primary-rgb: 62, 157, 215;
   --color-primary-hover: rgb(50, 140, 195);
   --color-primary-light: rgba(62, 157, 215, 0.1);
   --color-primary-light-20: rgba(62, 157, 215, 0.2);

@@ -4,7 +4,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="EventPage-loading">
         <div class="container">
-          <p>{{ trans('eventPage.loading') }}</p>
+          <Loader />
         </div>
       </div>
 
@@ -189,9 +189,9 @@
                 </section>
 
                 <!-- Purchase Info -->
-                <section v-if="eventPurchaseView?.buyerSupportView" class="EventPage-section EventPage-section--bordered">
+                <section v-if="buyerSupportView" class="EventPage-section EventPage-section--bordered">
                   <EventPurchaseInfo
-                    :buyer-support-view="eventPurchaseView.buyerSupportView"
+                    :buyer-support-view="buyerSupportView"
                   />
                 </section>
               </div>
@@ -215,7 +215,7 @@
                       {{ ticketType.price!.multiply(quantities[ticketType.id.toString()]).formatted() }}
                     </span>
                   </div>
-                  <div class="EventPage-summary-line">
+                  <div v-if="selectedTicketTypes.length > 1 && !serviceFee.isZero()" class="EventPage-summary-line">
                     <span class="EventPage-summary-label">{{ trans('eventPage.subtotal') }}</span>
                     <span class="EventPage-summary-value">{{ subtotal.formatted() }}</span>
                   </div>
@@ -283,9 +283,9 @@
   </MicrositeLayout>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script lang="ts">
+import { defineComponent, nextTick } from 'vue'
+
 import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
 import EventInfo from '../../common/EventInfo/EventInfo.vue'
 import TicketCard from '../../common/TicketCard/TicketCard.vue'
@@ -293,363 +293,407 @@ import GenreChip from '../../common/GenreChip/GenreChip.vue'
 import EventPurchaseInfo from '../../common/EventPurchaseInfo/EventPurchaseInfo.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
-import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
-import { useAppLanguage } from '../../../composables/useAppLanguage'
+import Loader from '../../ui/loader/Loader.vue'
+
+import { useCheckout } from '../../../composables/useCheckout'
+import { useAppLocale } from '../../../composables/useAppLocale'
+
 import { findEventPurchaseViewBySlug } from '../../../public-model/Event/EventView.services'
-import type { EventView } from '../../../public-model/Event/EventView'
 import type { EventPurchaseView } from '../../../public-model/Event/EventPurchaseView'
-import type { PromoterProfileView } from '../../../public-model/PromoterProfile/PromoterProfileView'
+import type { EventBuyerSupportView } from '../../../public-model/Event/EventBuyerSupportView'
 import { findTicketTypeViewsByEvent } from '../../../public-model/TicketType/TicketTypeView.services'
 import type { TicketTypeView } from '../../../public-model/TicketType/TicketTypeView'
 import { findFileViewById } from '../../../public-model/File/FileView.services'
 import type { FileView } from '../../../public-model/File/FileView'
-import type { VenueView } from '../../../public-model/Venue/VenueView'
+
 import { Locale } from '../../../shared/Locale'
 import { Money } from '../../../shared/Money'
 import { Currency } from '../../../shared/Currency'
+
 import eventPageTranslations from './event-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 
-const props = defineProps<{
-  slug: string
-}>()
-
-// Load translations
 translationService.addTranslations('eventPage', eventPageTranslations)
 
-// Use translation composable
-const { trans, appLanguage } = useAppLanguage()
+export default defineComponent({
+  name: 'EventPage',
 
-const loading = ref(true)
-const error = ref<string | null>(null)
-const eventPurchaseView = ref<EventPurchaseView | null>(null)
-const eventView = computed(() => eventPurchaseView.value?.eventView || null)
-const venueView = computed(() => eventPurchaseView.value?.venueView || null)
-const promoterProfileView = computed(() => eventPurchaseView.value?.promoterProfileView || null)
-const ticketTypeViews = ref<TicketTypeView[]>([])
-const minorsPolicyFileView = ref<FileView | null>(null)
-const currency = ref<Currency>(Currency.EUR)
+  components: {
+    MicrositeLayout,
+    EventInfo,
+    TicketCard,
+    GenreChip,
+    EventPurchaseInfo,
+    ButtonCustom,
+    Icon,
+    Loader
+  },
 
-const currentLocale = computed(() => Locale.fromString(appLanguage.value))
+  props: {
+    slug: {
+      type: String,
+      required: true
+    }
+  },
 
-const getTicketName = (ticket: TicketTypeView): string => {
-  if (!ticket.name || ticket.name.isEmpty()) return ''
-  return ticket.name.valueForLocaleOrAutoFallback(currentLocale.value) || ''
-}
+  data () {
+    // NOTE: usamos composable aquí para exponer `trans` + `appLanguage` a Options API
+    const { trans, appLocale } = useAppLocale()
 
-const getTicketDescription = (ticket: TicketTypeView): string => {
-  if (!ticket.description || ticket.description.isEmpty()) return ''
-  return ticket.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
-}
+    return {
+      // i18n
+      trans,
+      appLanguage: appLocale,
 
-const publishedTicketTypes = computed(() => {
-  return ticketTypeViews.value.filter(tt => tt.isPublished) as TicketTypeView[]
-})
+      // state
+      loading: true,
+      error: null as string | null,
 
+      eventPurchaseView: null as EventPurchaseView | null,
+      ticketTypeViews: [] as TicketTypeView[],
+      minorsPolicyFileView: null as FileView | null,
 
-const eventDate = computed(() => {
-  return eventView.value ? formatDates(eventView.value.dates) : ''
-})
+      currency: Currency.EUR as Currency,
+      quantities: {} as Record<string, number>,
 
-const eventTime = computed(() => {
-  if (!eventView.value) return ''
-  if (!eventView.value.startTime) return ''
-  const timeStr = formatTime(eventView.value.startTime as import('../../../shared/Time').Time)
-  const doorsTime = eventView.value.doorsOpenTime ? ` (Apertura de puertas: ${formatTime(eventView.value.doorsOpenTime as import('../../../shared/Time').Time)})` : ''
-  return `${timeStr}${doorsTime}`
-})
+      ticketsVisible: true,
+      observer: null as IntersectionObserver | null
+    }
+  },
 
-const eventVenue = computed(() => {
-  return venueView.value?.name || trans('eventPage.venue_to_confirm')
-})
+  computed: {
+    currentLocale (): Locale {
+      return Locale.fromString(this.appLanguage)
+    },
 
-const eventCity = computed(() => {
-  return venueView.value?.city || (venueView.value?.countryCode ? venueView.value.countryCode.toString() : (eventView.value?.countryCode ? eventView.value.countryCode.toString() : ''))
-})
+    eventView () {
+      return this.eventPurchaseView?.eventView || null
+    },
 
-const eventVenueAddress = computed(() => {
-  return venueView.value?.address || undefined
-})
+    venueView () {
+      return this.eventPurchaseView?.venueView || null
+    },
 
-const eventVenueGoogleMapsUrl = computed(() => {
-  if (!venueView.value?.coords) return undefined
-  return `https://www.google.com/maps?q=${venueView.value.coords.latitude()},${venueView.value.coords.longitude()}`
-})
+    promoterProfileView () {
+      return this.eventPurchaseView?.promoterProfileView || null
+    },
 
-const eventPromoter = computed(() => {
-  return promoterProfileView.value?.brandName || (eventView.value?.promoterProfileId ? trans('eventPage.organizer_to_confirm') : '')
-})
+    publishedTicketTypes (): TicketTypeView[] {
+      return this.ticketTypeViews.filter(tt => tt.isPublished) as TicketTypeView[]
+    },
 
-const eventTicketSaleClosesAt = computed(() => {
-  return eventView.value?.ticketSaleClosesAt ? formatDate(eventView.value.ticketSaleClosesAt) : undefined
-})
+    eventDate (): string {
+      return this.eventView ? this.formatDates(this.eventView.dates) : ''
+    },
 
-const eventMusicGenres = computed(() => {
-  return eventView.value?.musicGenres || []
-})
+    eventTime (): string {
+      if (!this.eventView?.startTime) return ''
+      const timeStr = this.formatTime(this.eventView.startTime as import('../../../shared/Time').Time)
+      const doorsTime = this.eventView.doorsOpenTime
+        ? ` (Apertura de puertas: ${this.formatTime(this.eventView.doorsOpenTime as import('../../../shared/Time').Time)})`
+        : ''
+      return `${timeStr}${doorsTime}`
+    },
 
-const eventDescription = computed(() => {
-  if (!eventView.value || !eventView.value.description || eventView.value.description.isEmpty()) return ''
-  return eventView.value.description.valueForLocaleOrAutoFallback(currentLocale.value) || ''
-})
+    eventVenue (): string {
+      return this.venueView?.name || this.trans('eventPage.venue_to_confirm')
+    },
 
-const eventTerms = computed(() => {
-  if (!eventView.value || !eventView.value.terms || eventView.value.terms.isEmpty()) return ''
-  return eventView.value.terms.valueForLocaleOrAutoFallback(currentLocale.value) || ''
-})
+    eventCity (): string {
+      return this.venueView?.city
+        || (this.venueView?.countryCode ? this.venueView.countryCode.toString() : (this.eventView?.countryCode ? this.eventView.countryCode.toString() : ''))
+    },
 
-const eventImageUrl = computed(() => {
-  return eventView.value?.imageUrl ? eventView.value.imageUrl.toString() : undefined
-})
+    eventVenueAddress (): string | undefined {
+      return this.venueView?.address || undefined
+    },
 
-const eventHasMinorsPolicy = computed(() => {
-  return eventView.value?.hasMinorsPolicy || false
-})
+    eventVenueGoogleMapsUrl (): string | undefined {
+      if (!this.venueView?.coords) return undefined
+      return `https://www.google.com/maps?q=${this.venueView.coords.latitude()},${this.venueView.coords.longitude()}`
+    },
 
-const eventMinorsPolicyDescription = computed(() => {
-  if (!eventView.value || !eventView.value.minorsPolicyDescription || eventView.value.minorsPolicyDescription.isEmpty()) return ''
-  return eventView.value.minorsPolicyDescription.valueForLocaleOrAutoFallback(currentLocale.value) || ''
-})
+    eventPromoter (): string {
+      return this.promoterProfileView?.brandName || (this.eventView?.promoterProfileId ? this.trans('eventPage.organizer_to_confirm') : '')
+    },
 
-const formatDate = (date: Date | null): string => {
-  if (!date) return ''
-  try {
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    eventMusicGenres (): string[] {
+      return this.eventView?.musicGenres || []
+    },
+
+    eventDescription (): string {
+      if (!this.eventView?.description || this.eventView.description.isEmpty()) return ''
+      return this.eventView.description.valueForLocaleOrAutoFallback(this.currentLocale) || ''
+    },
+
+    eventTerms (): string {
+      if (!this.eventView?.terms || this.eventView.terms.isEmpty()) return ''
+      return this.eventView.terms.valueForLocaleOrAutoFallback(this.currentLocale) || ''
+    },
+
+    formattedTerms (): string {
+      return (this.eventTerms ?? '').replace(/\n/g, '<br />')
+    },
+
+    eventImageUrl (): string | undefined {
+      return this.eventView?.imageUrl ? this.eventView.imageUrl.toString() : undefined
+    },
+
+    hasHeroImage (): boolean {
+      return !!this.eventImageUrl
+    },
+
+    eventHasMinorsPolicy (): boolean {
+      return this.eventView?.hasMinorsPolicy || false
+    },
+
+    eventMinorsPolicyDescription (): string {
+      if (!this.eventView?.minorsPolicyDescription || this.eventView.minorsPolicyDescription.isEmpty()) return ''
+      return this.eventView.minorsPolicyDescription.valueForLocaleOrAutoFallback(this.currentLocale) || ''
+    },
+
+    descriptionParagraphs (): string[] {
+      return (this.eventDescription ?? '').split('\n\n').filter((p: string) => p.trim())
+    },
+
+    minorsPolicyParagraphs (): string[] {
+      if (!this.eventMinorsPolicyDescription) return []
+      return this.eventMinorsPolicyDescription.split('\n\n').filter((p: string) => p.trim())
+    },
+
+    totalTickets (): number {
+      return Object.values(this.quantities).reduce((a, b) => a + b, 0)
+    },
+
+    subtotal (): Money {
+      const tickets = this.publishedTicketTypes
+      if (tickets.length === 0 || !tickets[0].price) {
+        return Money.zero(this.currency)
+      }
+
+      return tickets.reduce((total: Money, ticketType: TicketTypeView) => {
+        if (!ticketType.price) return total
+        const quantity = this.quantities[ticketType.id.toString()] || 0
+        if (quantity === 0) return total
+        return (total as any).add((ticketType.price as any).multiply(quantity)) as Money
+      }, Money.zero(tickets[0].price.currency()))
+    },
+
+    serviceFee (): Money {
+      if (!this.eventPurchaseView) return Money.zero(this.currency)
+      const feeDecimal = this.eventPurchaseView.buyerFeePercent / 100
+      return (this.subtotal as any).multiply(feeDecimal) as Money
+    },
+
+    serviceFeeLabel (): string {
+      const baseLabel = this.trans('eventPage.service_fee')
+      const percent = this.eventPurchaseView?.buyerFeePercent ?? 0
+      return percent > 0 ? `${baseLabel} (${percent}%)` : baseLabel
+    },
+
+    totalPrice (): Money {
+      return (this.subtotal as any).add(this.serviceFee) as Money
+    },
+
+    selectedTicketTypes (): TicketTypeView[] {
+      return this.publishedTicketTypes.filter((ticketType) => (this.quantities[ticketType.id.toString()] || 0) > 0)
+    },
+
+    isOnSale (): boolean {
+      return true
+    },
+
+    minPrice (): Money {
+      const tickets = this.publishedTicketTypes.filter(tt => tt.price !== null)
+      if (tickets.length === 0) return Money.zero(this.currency)
+
+      const first = tickets.find(t => t.price) || null
+      if (!first?.price) return Money.zero(this.currency)
+
+      return tickets.reduce((min, ticketType) => {
+        if (!ticketType.price) return min
+        return ticketType.price.amount() < min.amount() ? ticketType.price : min
+      }, first.price)
+    },
+
+    buyerSupportView (): EventBuyerSupportView | null {
+      return (this.eventPurchaseView?.buyerSupportView as EventBuyerSupportView) || null
+    }
+  },
+
+  mounted () {
+    this.loadEvent()
+
+    // el ref existe después del render
+    nextTick(() => {
+      this.setupObserver()
     })
-  } catch {
-    return ''
-  }
-}
+  },
 
-const formatTime = (time: import('../../../shared/Time').Time | null): string => {
-  if (!time) return ''
-  return time.toShortString() + 'h'
-}
+  beforeUnmount () {
+    this.teardownObserver()
+  },
 
-const formattedTerms = computed(() => {
-  return (eventTerms.value ?? '').replace(/\n/g, '<br />')
-})
+  methods: {
+    getTicketName (ticket: TicketTypeView): string {
+      if (!ticket.name || ticket.name.isEmpty()) return ''
+      return ticket.name.valueForLocaleOrAutoFallback(this.currentLocale) || ''
+    },
 
-const hasHeroImage = computed(() => {
-  return !!eventImageUrl.value
-})
+    getTicketDescription (ticket: TicketTypeView): string {
+      if (!ticket.description || ticket.description.isEmpty()) return ''
+      return ticket.description.valueForLocaleOrAutoFallback(this.currentLocale) || ''
+    },
 
-const formatDates = (dates: Date[]): string => {
-  if (!dates || dates.length === 0) return ''
-  if (dates.length === 1) return formatDate(dates[0])
-  return [dates[0], dates[1]].map((d) => formatDate(d)).filter(Boolean).join(' · ')
-}
+    formatDate (date: Date | null): string {
+      if (!date) return ''
+      try {
+        return date.toLocaleDateString('es-ES', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      } catch {
+        return ''
+      }
+    },
 
+    formatTime (time: import('../../../shared/Time').Time | null): string {
+      if (!time) return ''
+      return time.toShortString() + 'h'
+    },
 
-const loadEvent = async () => {
-  loading.value = true
-  error.value = null
-  
-  try {
-    const purchaseView = await findEventPurchaseViewBySlug(props.slug)
-    eventPurchaseView.value = purchaseView
-    
-    loading.value = false
-    
-    if (purchaseView.eventView) {
-      loadTicketTypes(purchaseView.eventView.id.toString())
-      if (purchaseView.eventView.hasMinorsPolicy && purchaseView.eventView.minorsPolicyAthorizationFileId) {
-        loadMinorsPolicyFile(purchaseView.eventView.minorsPolicyAthorizationFileId.toString())
+    formatDates (dates: Date[]): string {
+      if (!dates || dates.length === 0) return ''
+      if (dates.length === 1) return this.formatDate(dates[0])
+      return [dates[0], dates[1]].map(d => this.formatDate(d)).filter(Boolean).join(' · ')
+    },
+
+    async loadEvent () {
+      this.loading = true
+      this.error = null
+
+      try {
+        const purchaseView = await findEventPurchaseViewBySlug(this.slug)
+        this.eventPurchaseView = purchaseView
+
+        if (purchaseView.eventView) {
+          await this.loadTicketTypes(purchaseView.eventView.id.toString())
+
+          // OJO: mantengo tu nombre tal cual (parece typo en el modelo)
+          const fileId = (purchaseView.eventView as any).minorsPolicyAthorizationFileId
+          if (purchaseView.eventView.hasMinorsPolicy && fileId) {
+            await this.loadMinorsPolicyFile(fileId.toString())
+          }
+        }
+      } catch (err) {
+        this.error = 'Error al cargar el evento'
+        console.error('Error loading event:', err)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async loadMinorsPolicyFile (fileId: string) {
+      try {
+        this.minorsPolicyFileView = await findFileViewById(fileId)
+      } catch (err) {
+        console.warn('Error loading minors policy file:', err)
+      }
+    },
+
+    async loadTicketTypes (eventId: string) {
+      try {
+        const loadedTicketTypes = await findTicketTypeViewsByEvent(eventId)
+        this.ticketTypeViews = loadedTicketTypes
+
+        const published = loadedTicketTypes.filter((tt: TicketTypeView) => tt.isPublished)
+        const firstTicketTypeWithPrice = published.find((tt: TicketTypeView) => tt.price !== null)
+
+        if (firstTicketTypeWithPrice?.price) {
+          this.currency = firstTicketTypeWithPrice.price.currency()
+        }
+
+        const { getCheckoutData } = useCheckout()
+        const savedCheckout = getCheckoutData()
+
+        const initialQuantities: Record<string, number> = {}
+        published.forEach((ticketType: TicketTypeView) => {
+          const ticketId = ticketType.id.toString()
+          if (savedCheckout && savedCheckout.eventSlug === this.slug && savedCheckout.quantities[ticketId] !== undefined) {
+            initialQuantities[ticketId] = savedCheckout.quantities[ticketId]
+          } else {
+            initialQuantities[ticketId] = 0
+          }
+        })
+        this.quantities = initialQuantities
+      } catch (err) {
+        console.warn('Error loading ticket types:', err)
+      }
+    },
+
+    handleQuantityChange (ticketId: string, quantity: number) {
+      this.quantities = { ...this.quantities, [ticketId]: quantity }
+    },
+
+    scrollToTickets () {
+      const el = this.$refs.ticketSectionRef as HTMLElement | undefined
+      el?.scrollIntoView({ behavior: 'smooth' })
+    },
+
+    handleCtaClick () {
+      if (!this.ticketsVisible && this.totalTickets === 0) {
+        this.scrollToTickets()
+        return
+      }
+
+      if (this.totalTickets > 0) {
+        const { setCheckoutData } = useCheckout()
+        setCheckoutData({
+          items: this.selectedTicketTypes.map((ticketType: TicketTypeView) => ({
+            id: ticketType.id.toString(),
+            name: this.getTicketName(ticketType),
+            price: ticketType.price!,
+            quantity: this.quantities[ticketType.id.toString()]
+          })),
+          quantities: this.quantities,
+          subtotal: this.subtotal,
+          serviceFee: this.serviceFee,
+          total: this.totalPrice,
+          eventSlug: this.slug,
+          eventTitle: this.eventView?.title.valueForLocaleOrAutoFallback(this.currentLocale) || '',
+          eventDate: this.eventDate,
+          eventVenue: `${this.eventVenue}, ${this.eventCity}`
+        })
+        this.$router.push('/checkout')
+      }
+    },
+
+    setupObserver () {
+      const el = this.$refs.ticketSectionRef as HTMLElement | undefined
+      if (!el) return
+
+      this.observer = new IntersectionObserver(
+        ([entry]) => {
+          this.ticketsVisible = entry.isIntersecting
+        },
+        { threshold: 0.1 }
+      )
+
+      this.observer.observe(el)
+    },
+
+    teardownObserver () {
+      if (this.observer) {
+        this.observer.disconnect()
+        this.observer = null
       }
     }
-  } catch (err) {
-    error.value = 'Error al cargar el evento'
-    console.error('Error loading event:', err)
-    loading.value = false
-  }
-}
-
-const loadMinorsPolicyFile = async (fileId: string) => {
-  try {
-    const file = await findFileViewById(fileId)
-    minorsPolicyFileView.value = file
-  } catch (err) {
-    console.warn('Error loading minors policy file:', err)
-  }
-}
-
-const loadTicketTypes = async (eventId: string) => {
-  try {
-    const loadedTicketTypes = await findTicketTypeViewsByEvent(eventId)
-    ticketTypeViews.value = loadedTicketTypes
-    
-    const published = loadedTicketTypes.filter((tt: TicketTypeView) => tt.isPublished)
-    const firstTicketTypeWithPrice = published.find((tt: TicketTypeView) => tt.price !== null)
-    
-    if (!firstTicketTypeWithPrice || !firstTicketTypeWithPrice.price) {
-      throw new Error('No ticket type with price found')
-    }
-    
-    currency.value = firstTicketTypeWithPrice.price.currency()
-    
-    const { getCheckoutData } = useCheckout()
-    const savedCheckout = getCheckoutData()
-    
-    const initialQuantities: Record<string, number> = {}
-    published.forEach((ticketType: TicketTypeView) => {
-      const ticketId = ticketType.id.toString()
-      if (savedCheckout && savedCheckout.eventSlug === props.slug && savedCheckout.quantities[ticketId] !== undefined) {
-        initialQuantities[ticketId] = savedCheckout.quantities[ticketId]
-      } else {
-        initialQuantities[ticketId] = 0
-      }
-    })
-    quantities.value = initialQuantities
-  } catch (err) {
-    console.warn('Error loading ticket types:', err)
-  }
-}
-
-onMounted(() => {
-  loadEvent()
-})
-
-const router = useRouter()
-const ticketSectionRef = ref<HTMLElement | null>(null)
-const ticketsVisible = ref(true)
-
-const quantities = ref<Record<string, number>>({})
-
-const totalTickets = computed(() => {
-  return Object.values(quantities.value).reduce((a, b) => a + b, 0)
-})
-
-const subtotal = computed((): Money => {
-  if (publishedTicketTypes.value.length === 0) {
-    throw new Error('Cannot calculate subtotal without tickets')
-  }
-  const firstTicketType = publishedTicketTypes.value[0]
-  if (!firstTicketType.price) {
-    throw new Error('First ticket type must have a price')
-  }
-  const initialTotal = Money.zero(firstTicketType.price.currency())
-  return publishedTicketTypes.value.reduce((total: Money, ticketType) => {
-    if (!ticketType.price) return total
-    const quantity = quantities.value[ticketType.id.toString()] || 0
-    if (quantity === 0) return total
-    const ticketPrice = ticketType.price as Money
-    const multipliedPrice = (ticketPrice as any).multiply(quantity) as Money
-    return (total as any).add(multipliedPrice) as Money
-  }, initialTotal)
-})
-
-const serviceFee = computed((): Money => {
-  if (!eventPurchaseView.value) {
-    return Money.zero(currency.value)
-  }
-  const feeDecimal = eventPurchaseView.value.buyerFeePercent / 100
-  return (subtotal.value as any).multiply(feeDecimal) as Money
-})
-
-const serviceFeeLabel = computed(() => {
-  const baseLabel = trans('eventPage.service_fee')
-  if (!eventPurchaseView.value) {
-    return baseLabel
-  }
-  const percent = eventPurchaseView.value.buyerFeePercent
-  if (percent === 0) {
-    return baseLabel
-  }
-  return `${baseLabel} (${percent}%)`
-})
-
-const totalPrice = computed((): Money => {
-  return (subtotal.value as any).add(serviceFee.value) as Money
-})
-
-const selectedTicketTypes = computed(() => {
-  return publishedTicketTypes.value.filter((ticketType) => quantities.value[ticketType.id.toString()] > 0)
-})
-
-const isOnSale = computed(() => {
-  return true
-})
-
-const minPrice = computed(() => {
-  if (publishedTicketTypes.value.length === 0) {
-    return Money.zero(currency.value)
-  }
-  const ticketTypesWithPrice = publishedTicketTypes.value.filter(tt => tt.price !== null)
-  if (ticketTypesWithPrice.length === 0) {
-    return Money.zero(currency.value)
-  }
-  return ticketTypesWithPrice.reduce((min, ticketType) => {
-    if (!ticketType.price) return min
-    return ticketType.price.amount() < min.amount() ? ticketType.price : min
-  }, ticketTypesWithPrice[0].price!)
-})
-
-const descriptionParagraphs = computed(() => {
-  return (eventDescription.value ?? '').split('\n\n').filter((p: string) => p.trim())
-})
-
-const minorsPolicyParagraphs = computed(() => {
-  if (!eventMinorsPolicyDescription.value) return []
-  return eventMinorsPolicyDescription.value.split('\n\n').filter((p: string) => p.trim())
-})
-
-const handleQuantityChange = (ticketId: string, quantity: number) => {
-  quantities.value = { ...quantities.value, [ticketId]: quantity }
-}
-
-const scrollToTickets = () => {
-  ticketSectionRef.value?.scrollIntoView({ behavior: 'smooth' })
-}
-
-const handleCtaClick = () => {
-  if (!ticketsVisible.value && totalTickets.value === 0) {
-    scrollToTickets()
-  } else if (totalTickets.value > 0) {
-    const { setCheckoutData } = useCheckout()
-    setCheckoutData({
-      items: selectedTicketTypes.value.map((ticketType) => ({
-        id: ticketType.id.toString(),
-        name: getTicketName(ticketType),
-        price: ticketType.price!,
-        quantity: quantities.value[ticketType.id.toString()]
-      })),
-      quantities: quantities.value,
-      subtotal: subtotal.value,
-      serviceFee: serviceFee.value,
-      total: totalPrice.value,
-      eventSlug: props.slug,
-      eventTitle: eventView.value?.title.valueForLocaleOrAutoFallback(currentLocale.value) || '',
-      eventDate: eventDate.value,
-      eventVenue: `${eventVenue.value}, ${eventCity.value}`
-    })
-    router.push('/checkout')
-  }
-}
-
-let observer: IntersectionObserver | null = null
-
-onMounted(() => {
-  if (ticketSectionRef.value) {
-    observer = new IntersectionObserver(
-      ([entry]) => {
-        ticketsVisible.value = entry.isIntersecting
-      },
-      { threshold: 0.1 }
-    )
-    observer.observe(ticketSectionRef.value)
-  }
-})
-
-onUnmounted(() => {
-  if (observer) {
-    observer.disconnect()
   }
 })
 </script>
+
 
 <style lang="scss">
 .EventPage {
@@ -1083,10 +1127,8 @@ onUnmounted(() => {
   }
 
   &-loading {
-    p {
-      color: var(--color-muted-foreground);
-      font-size: 1.125rem;
-    }
+    color: var(--color-muted-foreground);
+    font-size: 1.125rem;
   }
 
   &-error {
