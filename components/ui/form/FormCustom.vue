@@ -57,7 +57,6 @@ export default {
             }
 
             > label {
-                color: $color-text-title;
                 width: unset;
                 line-height: 1.3;
                 margin-bottom: 0.5em;

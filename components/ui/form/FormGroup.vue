@@ -8,6 +8,9 @@
       <div class="FormGroup-body" ref="body">
         <slot></slot>
       </div>
+      <div class="FormGroup-hint" v-if="hint">
+        {{ hint }}
+      </div>
       <div class="FormGroup-errors" v-if="errors && errors.length > 0">
         <div v-for="(error, index) in errors" :key="index" class="error">{{ error }}</div>
       </div>
@@ -27,7 +30,8 @@ export default {
         alignCenter: Boolean,
         bodyInline: Boolean,
         required: Boolean,
-        spaced: Boolean
+        spaced: Boolean,
+        hint: String
     },
 
     setup() {
@@ -60,7 +64,7 @@ export default {
 
             return this.validations.$errors.reduce(
                 (errors: string[], error: any) => {
-                    const validationKey = 'validation.' + error.$validator
+                    const validationKey = 'formValidations.' + error.$validator
                     const validatorKey = error.$validator
                     const validatorData = (this.validations as any)[validatorKey]
                     const params = validatorData?.$params || {}
@@ -100,6 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
+@use '../../../assets/scss/mixins' as *;
 
 $label-width-xl: 200px;
 
@@ -115,7 +120,6 @@ $label-width-xl: 200px;
     }
 
     > label {
-        color: $color-text-themeDark;
         display: inline-block;
         font-weight: normal;
         padding-right: 1.3em;
@@ -217,7 +221,7 @@ $label-width-xl: 200px;
             margin-top: 0.15em;
 
             a {
-                color: $color-link;
+                color: var(--color-primary);
 
                 &:hover {
                     text-decoration: underline;
@@ -238,7 +242,7 @@ $label-width-xl: 200px;
         textarea,
         input[type='checkbox']:before,
         input[type='radio']:before {
-            border-color: $color-error;
+            border-color: var(--color-error);
         }
     }
 
@@ -276,24 +280,19 @@ $label-width-xl: 200px;
         }
     }
 
+    &-hint {
+        margin-top: 0.5em;
+        font-size: 0.75rem;
+        color: var(--color-N70);
+    }
+
     &-errors {
         margin-top: 0.5em;
-        color: $color-error;
+        color: var(--color-error);
     }
 }
 
-.themeLight {
-
-    .FormGroup {
-
-        > label {
-            color: $color-text-themeLight;
-        }
-    }
-}
-
-@media (max-width: $sm-max) or ((max-width: $md-max) and (orientation: landscape)) {
-
+@include mobile {
     .FormGroup {
         display: block;
 

@@ -215,13 +215,15 @@
                       {{ ticketType.price!.multiply(quantities[ticketType.id.toString()]).formatted() }}
                     </span>
                   </div>
-                  <div v-if="selectedTicketTypes.length > 1 && !serviceFee.isZero()" class="EventPage-summary-line">
-                    <span class="EventPage-summary-label">{{ trans('eventPage.subtotal') }}</span>
-                    <span class="EventPage-summary-value">{{ subtotal.formatted() }}</span>
-                  </div>
-                  <div class="EventPage-summary-line">
-                    <span class="EventPage-summary-label">{{ serviceFeeLabel }}</span>
-                    <span class="EventPage-summary-value">{{ serviceFee.formatted() }}</span>
+                  <div class="EventPage-summary-calculation">
+                    <div v-if="selectedTicketTypes.length > 1 && !serviceFee.isZero()" class="EventPage-summary-line">
+                      <span class="EventPage-summary-label">{{ trans('eventPage.subtotal') }}</span>
+                      <span class="EventPage-summary-value">{{ subtotal.formatted() }}</span>
+                    </div>
+                    <div class="EventPage-summary-line">
+                      <span class="EventPage-summary-label">{{ serviceFeeLabel }}</span>
+                      <span class="EventPage-summary-value">{{ serviceFee.formatted() }}</span>
+                    </div>
                   </div>
                 </div>
                 <p v-else class="EventPage-summary-empty">
@@ -1018,12 +1020,22 @@ export default defineComponent({
     color: var(--color-foreground);
   }
 
+  &-summary-calculation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border);
+
+    .EventPage-summary-line:not(:last-child) {
+      margin-bottom: var(--spacing-xs);
+    }
+  }
+
   &-summary-line {
     display: flex;
     justify-content: space-between;
     font-size: 0.875rem;
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--color-border);
   }
 
   &-summary-label {
@@ -1046,6 +1058,7 @@ export default defineComponent({
     align-items: center;
     border-top: 1px solid var(--color-border);
     padding-top: var(--spacing-md);
+    margin-top: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
   }
 

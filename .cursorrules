@@ -20,6 +20,15 @@
 - Element: descriptive element name in kebab-case (e.g., `title`, `main-title`)
 - Modifier: optional state or variant, prefixed with `--` (e.g., `--active`, `--disabled`)
 
+## Colors
+- **Always prefer using color variables from `assets/scss/partials/theme.scss`**
+- When adding a color, first check if there's an appropriate variable available:
+  - **Neutral/Gray scale**: Use `--color-N0` through `--color-N100` (N0 is darkest, N100 is lightest in light mode)
+  - **Primary scale**: Use `--color-primary-0` through `--color-primary-100` (0 is darkest, 100 is lightest, 50 is base)
+  - Also check for semantic tokens like `--color-text`, `--color-background`, `--color-border`, etc.
+- Only use hardcoded hex/rgb colors if no suitable variable exists in the theme
+- Use CSS custom properties syntax: `var(--color-N50)` or `var(--color-primary-50)`
+
 ## Code Style
 - Use 2 spaces for indentation
 - Use single quotes for strings in JavaScript/TypeScript

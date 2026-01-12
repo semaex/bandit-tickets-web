@@ -1,0 +1,48 @@
+{
+  "es-ES": {
+    "required": "Campo obligatorio",
+    "minLength": "Debe tener al menos {{min}} carácteres",
+    "email": "El email no es válido",
+    "sameAsPassword": "La contraseña no es la misma",
+    "sameAsEmail": "Los emails no coinciden",
+    "uploadMaxSize": "El tamaño máximo del fichero debe ser de {{maxSize}}",
+    "checkRequired": ""
+  },
+  "en-GB": {
+    "required": "Field required",
+    "minLength": "Must have at least {{min}} characters",
+    "email": "Email is not valid",
+    "sameAsPassword": "Password is not the same",
+    "sameAsEmail": "Emails do not match",
+    "uploadMaxSize": "Maximum file size must be {{maxSize}}",
+    "checkRequired": ""
+  },
+  "ca-ES": {
+    "required": "Camp obligatori",
+    "minLength": "Ha de tenir almenys {{min}} caràcters",
+    "email": "L'email no és vàlid",
+    "sameAsPassword": "La contrasenya no és la mateixa",
+    "sameAsEmail": "Els emails no coincideixen",
+    "uploadMaxSize": "La mida màxima del fitxer ha de ser de {{maxSize}}",
+    "checkRequired": ""
+  },
+  "eu-ES": {
+    "required": "Eremua derrigorrezkoa",
+    "minLength": "Gutxienez {{min}} karaktere izan behar ditu",
+    "email": "Emaila ez da baliozkoa",
+    "sameAsPassword": "Pasahitza ez da bera",
+    "sameAsEmail": "Emailak ez datoz bat",
+    "uploadMaxSize": "Fitxategiaren tamaina maximoa {{maxSize}} izan behar du",
+    "checkRequired": ""
+  },
+  "gl-ES": {
+    "required": "Campo obrigatorio",
+    "minLength": "Debe ter polo menos {{min}} caracteres",
+    "email": "O email non é válido",
+    "sameAsPassword": "A contrasinal non é a mesma",
+    "sameAsEmail": "Os emails non coinciden",
+    "uploadMaxSize": "O tamaño máximo do ficheiro debe ser de {{maxSize}}",
+    "checkRequired": ""
+  }
+}
+

@@ -7,7 +7,28 @@
       "ca-ES": "Catalán",
       "eu-ES": "Euskera",
       "gl-ES": "Gallego"
-    }
+    },
+    "gender": {
+      "male": "Hombre",
+      "female": "Mujer",
+      "non_binary": "No binario",
+      "prefer_not_to_say": "Prefiero no decirlo"
+    },
+    "day": "Día",
+    "month": "Mes",
+    "year": "Año",
+    "month_1": "Enero",
+    "month_2": "Febrero",
+    "month_3": "Marzo",
+    "month_4": "Abril",
+    "month_5": "Mayo",
+    "month_6": "Junio",
+    "month_7": "Julio",
+    "month_8": "Agosto",
+    "month_9": "Septiembre",
+    "month_10": "Octubre",
+    "month_11": "Noviembre",
+    "month_12": "Diciembre"
   },
   "en-GB": {
     "Loading": "Loading",
@@ -17,7 +38,28 @@
       "ca-ES": "Catalan",
       "eu-ES": "Basque",
       "gl-ES": "Galician"
-    }
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "non_binary": "Non-binary",
+      "prefer_not_to_say": "Prefer not to say"
+    },
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "month_1": "January",
+    "month_2": "February",
+    "month_3": "March",
+    "month_4": "April",
+    "month_5": "May",
+    "month_6": "June",
+    "month_7": "July",
+    "month_8": "August",
+    "month_9": "September",
+    "month_10": "October",
+    "month_11": "November",
+    "month_12": "December"
   },
   "ca-ES": {
     "Loading": "Carregant",
@@ -27,7 +69,28 @@
       "ca-ES": "Català",
       "eu-ES": "Euskera",
       "gl-ES": "Gallec"
-    }
+    },
+    "gender": {
+      "male": "Home",
+      "female": "Dona",
+      "non_binary": "No binari",
+      "prefer_not_to_say": "Prefereixo no dir-ho"
+    },
+    "day": "Dia",
+    "month": "Mes",
+    "year": "Any",
+    "month_1": "Gener",
+    "month_2": "Febrer",
+    "month_3": "Març",
+    "month_4": "Abril",
+    "month_5": "Maig",
+    "month_6": "Juny",
+    "month_7": "Juliol",
+    "month_8": "Agost",
+    "month_9": "Setembre",
+    "month_10": "Octubre",
+    "month_11": "Novembre",
+    "month_12": "Desembre"
   },
   "eu-ES": {
     "Loading": "Kargatzen",
@@ -37,7 +100,28 @@
       "ca-ES": "Katalana",
       "eu-ES": "Euskera",
       "gl-ES": "Galiziera"
-    }
+    },
+    "gender": {
+      "male": "Gizona",
+      "female": "Emakumea",
+      "non_binary": "Ez-bitarra",
+      "prefer_not_to_say": "Nahiago dut ez esan"
+    },
+    "day": "Eguna",
+    "month": "Hilabetea",
+    "year": "Urtea",
+    "month_1": "Urtarrila",
+    "month_2": "Otsaila",
+    "month_3": "Martxoa",
+    "month_4": "Apirila",
+    "month_5": "Maiatza",
+    "month_6": "Ekaina",
+    "month_7": "Uztaila",
+    "month_8": "Abuztua",
+    "month_9": "Iraila",
+    "month_10": "Urria",
+    "month_11": "Azaroa",
+    "month_12": "Abendua"
   },
   "gl-ES": {
     "Loading": "Cargando",
@@ -47,7 +131,28 @@
       "ca-ES": "Catalán",
       "eu-ES": "Euskera",
       "gl-ES": "Galego"
-    }
+    },
+    "gender": {
+      "male": "Home",
+      "female": "Muller",
+      "non_binary": "Non binario",
+      "prefer_not_to_say": "Prefiro non dicilo"
+    },
+    "day": "Día",
+    "month": "Mes",
+    "year": "Ano",
+    "month_1": "Xaneiro",
+    "month_2": "Febreiro",
+    "month_3": "Marzo",
+    "month_4": "Abril",
+    "month_5": "Maio",
+    "month_6": "Xuño",
+    "month_7": "Xullo",
+    "month_8": "Agosto",
+    "month_9": "Setembro",
+    "month_10": "Outubro",
+    "month_11": "Novembro",
+    "month_12": "Decembro"
   }
 }
 

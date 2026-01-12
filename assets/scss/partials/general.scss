@@ -1,0 +1,85 @@
+@use '../mixins' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html,
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-family-primary);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  &.scroll-blocked {
+    overflow: hidden;
+  }
+}
+
+body {
+  line-height: 1.6;
+  background: var(--gradient-subtle);
+  min-height: 100vh;
+}
+
+main {
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+a {
+  cursor: pointer;
+  color: var(--color-foreground);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+p {
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* Utility classes */
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+.text-oneline {
+  white-space: nowrap;
+}
+
+@include mobile {
+  .hidden-sm {
+    display: none !important;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+}

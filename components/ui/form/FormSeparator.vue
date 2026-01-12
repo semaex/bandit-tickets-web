@@ -24,6 +24,7 @@ export default {
 </script>
 
 <style lang="scss">
+@use '../../../assets/scss/mixins' as *;
 
 .FormSeparator {
     height: 50px;
@@ -46,15 +47,14 @@ export default {
     }
 }
 
-@media (max-width: $sm-max) {
+@include mobile {
+  .FormSeparator {
+    height: 30px;
 
-    .FormSeparator {
-        height: 30px;
-
-        &--small {
-            height: 15px;
-        }
+    &--small {
+      height: 15px;
     }
+  }
 }
 
 </style>

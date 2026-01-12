@@ -1,6 +1,8 @@
 import generalTranslations from '../i18n/general.i18n.json'
 import musicGenresTranslations from '../i18n/music-genres.i18n.json'
-import { type AppLocale, appLocales } from '../i18n/locales'
+import formValidationsTranslations from '../i18n/form-validations.i18n.json'
+import countriesTranslations from '../i18n/countries.i18n.json'
+import { type AppLocale } from '../i18n/locales'
 
 interface Translations {
   [locale: string]: Record<string, any>
@@ -13,6 +15,8 @@ class TranslationService {
     this.translations = {}
     this.addTranslations('general', generalTranslations)
     this.addTranslations('musicGenres', musicGenresTranslations)
+    this.addTranslations('formValidations', formValidationsTranslations)
+    this.addTranslations('countries', countriesTranslations)
   }
 
   /**

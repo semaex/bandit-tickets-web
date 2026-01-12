@@ -30,14 +30,13 @@ export default {
 </script>
 
 <style lang="scss">
+@use '../../../assets/scss/mixins' as *;
 
 .FormRow {
-    width: calc(100% + 20px);
     display: inline-flex;
-    margin-left: -10px;
-    margin-right: -10px;
     flex-wrap: wrap;
     align-items: flex-start;
+    gap: 20px;
 
     &:last-child {
         margin-bottom: -1em;
@@ -49,8 +48,6 @@ export default {
 
     .FormGroup {
         width: unset;
-        padding-left: 10px;
-        padding-right: 10px;
     }
 
     &--spaceBetween {
@@ -62,18 +59,10 @@ export default {
     }
 }
 
-@media (max-width: $sm-max) {
-
-    .FormRow {
-        width: calc(100% + 10px);
-        margin-left: -5px;
-        margin-right: -5px;
-
-        .FormGroup {
-            padding-left: 5px;
-            padding-right: 5px;
-        }
-    }
+@include mobile {
+  .FormRow {
+    gap: 10px;
+  }
 }
 
 </style>
