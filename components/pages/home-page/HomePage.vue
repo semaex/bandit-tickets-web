@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import MicrositeLayout from '../../layout/microsite-layout/MicrositeLayout.vue'
 import { useAppLocale } from '../../../composables/useAppLocale'
 import homePageTranslations from './home-page.i18n.json'
 import { translationService } from '../../../services/translation.service'

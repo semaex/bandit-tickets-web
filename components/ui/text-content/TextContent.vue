@@ -33,8 +33,6 @@ export default {
 
 <style lang="scss">
 
-@use '../../../assets/scss/mixins' as *;
-
 .TextContent {
     line-height: 1.5;
 
@@ -69,15 +67,15 @@ export default {
     }
 
     h2 {
-        font-size: 1.75em;
-    }
-
-    h3 {
         font-size: 1.50em;
     }
 
+    h3 {
+        font-size: 1.25em;
+    }
+
     h4 {
-        font-size: 1.40em;
+        font-size: 1.25em;
     }
 
     h5 {
@@ -153,7 +151,7 @@ export default {
 }
 
 
-@include mobile {
+@media (max-width: 767.98px) {
 
     .TextContent {
 

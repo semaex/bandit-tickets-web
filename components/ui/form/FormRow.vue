@@ -30,7 +30,6 @@ export default {
 </script>
 
 <style lang="scss">
-@use '../../../assets/scss/mixins' as *;
 
 .FormRow {
     display: inline-flex;
@@ -59,7 +58,7 @@ export default {
     }
 }
 
-@include mobile {
+@media (max-width: 767.98px) {
   .FormRow {
     gap: 10px;
   }

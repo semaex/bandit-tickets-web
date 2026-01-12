@@ -19,14 +19,14 @@
                     <div class="CheckoutPage-wrapper">
                         <h1 class="CheckoutPage-title">{{ trans('checkoutPage.title') }}</h1>
 
-                        <div v-if="!checkoutData || checkoutData.items.length === 0" class="CheckoutPage-empty">
+                        <div v-if="!checkoutData || checkoutData.items.length === 0" class="CheckoutPage-empty" v-show="false">
                             <h2 class="CheckoutPage-empty-title">{{ trans('checkoutPage.empty_title') }}</h2>
                             <button class="CheckoutPage-empty-button" @click="handleBack">
                                 {{ trans('checkoutPage.back_to_event') }}
                             </button>
                         </div>
 
-                        <div v-else class="CheckoutPage-grid">
+                        <div class="CheckoutPage-grid">
                             <!-- Form Column -->
                             <div class="CheckoutPage-form-section">
                                 <!-- Guest Checkout Form -->
@@ -46,23 +46,23 @@
                                     <FormCustom vertical :submit="handleSubmit">
 
                                         <FormRow>
-                                            <FormGroup :label="trans('checkoutPage.first_name_label')" :validations="v$ && v$.formData && v$.formData.firstName">
+                                            <FormGroup :label="trans('checkoutPage.first_name_label')" :validations="v$ && v$.formData && v$.formData.firstName" required>
                                                 <InputCustom
                                                     id="firstName"
                                                     v-model="formData.firstName"
                                                     type="text"
                                                     :icon="'user'"
-                                                    :placeholder="trans('checkoutPage.first_name_placeholder')"
+                                                    maxlength="100"
                                                 />
                                             </FormGroup>
 
-                                            <FormGroup :label="trans('checkoutPage.last_name')" :validations="v$ && v$.formData && v$.formData.lastName">
+                                            <FormGroup :label="trans('checkoutPage.last_name')" :validations="v$ && v$.formData && v$.formData.lastName" required>
                                                 <InputCustom
                                                     id="lastName"
                                                     v-model="formData.lastName"
                                                     type="text"
                                                     :icon="'user'"
-                                                    :placeholder="trans('checkoutPage.last_name_placeholder')"
+                                                    maxlength="100"
                                                 />
                                             </FormGroup>
                                         </FormRow>
@@ -72,26 +72,28 @@
                                                 :label="trans('checkoutPage.email_label')"
                                                 :validations="v$ && v$.formData && v$.formData.email"
                                                 :hint="trans('checkoutPage.email_hint')"
+                                                required
                                             >
                                                 <InputCustom
                                                     id="email"
                                                     v-model="formData.email"
                                                     type="email"
                                                     :icon="'mail'"
-                                                    :placeholder="trans('checkoutPage.email_placeholder')"
+                                                    maxlength="255"
                                                 />
                                             </FormGroup>
 
                                             <FormGroup
                                                 :label="trans('checkoutPage.confirm_email_label')"
                                                 :validations="v$ && v$.formData && v$.formData.confirmEmail"
+                                                required
                                             >
                                                 <InputCustom
                                                     id="confirm_email"
                                                     v-model="formData.confirmEmail"
                                                     type="email"
                                                     :icon="'mail'"
-                                                    :placeholder="trans('checkoutPage.email_placeholder')"
+                                                    maxlength="255"
                                                 />
                                             </FormGroup>
                                         </FormRow>
@@ -116,6 +118,7 @@
                                                     v-model="formData.postalCode"
                                                     type="text"
                                                     :icon="'map-pin'"
+                                                    maxlength="10"
                                                 />
                                             </FormGroup>
                                         </FormRow>
@@ -129,6 +132,7 @@
                                                     id="birthdate"
                                                     v-model="formData.birthdate"
                                                 />
+                                                {{ formData.birthdate }}
                                             </FormGroup>
 
                                             <FormGroup
@@ -142,22 +146,22 @@
                                             </FormGroup>
                                         </FormRow>
 
-                                        <FormGroup>
-                                            <div class="CheckoutPage-checkbox-wrapper">
-                                                <input
-                                                    id="terms"
-                                                    v-model="acceptTerms"
-                                                    type="checkbox"
-                                                    class="CheckoutPage-checkbox"
-                                                />
-                                                <label for="terms" class="CheckoutPage-checkbox-label">
+                                        <InputCheckboxList>
+                                            <FormGroup :validations="v$ && v$.acceptTerms">
+                                                <InputCheckboxListItem v-model="acceptTerms">
                                                     {{ trans('checkoutPage.accept_terms_prefix') }}
-                                                    <a href="#" class="CheckoutPage-link">{{ trans('checkoutPage.terms_and_conditions') }}</a>
+                                                    <a href="#" class="CheckoutPage-link" @click.prevent="showTermsModal = true">{{ trans('checkoutPage.terms_and_conditions') }}</a>
                                                     {{ trans('checkoutPage.and_the') }}
-                                                    <a href="#" class="CheckoutPage-link">{{ trans('checkoutPage.privacy_policy') }}</a>
-                                                </label>
-                                            </div>
-                                        </FormGroup>
+                                                    <a href="#" class="CheckoutPage-link" @click.prevent="showPrivacyModal = true">{{ trans('checkoutPage.privacy_policy') }}</a>
+                                                </InputCheckboxListItem>
+                                            </FormGroup>
+
+                                            <FormGroup>
+                                                <InputCheckboxListItem v-model="acceptMarketing">
+                                                    {{ trans('checkoutPage.accept_marketing') }}
+                                                </InputCheckboxListItem>
+                                            </FormGroup>
+                                        </InputCheckboxList>
 
                                         <!-- Mobile Submit -->
                                         <FormGroup>
@@ -196,9 +200,9 @@
                                             <Icon name="ticket" size="md" class="CheckoutPage-event-icon"/>
                                         </div>
                                         <div class="CheckoutPage-event-details">
-                                            <h3 class="CheckoutPage-event-title">{{ checkoutData.eventTitle }}</h3>
-                                            <p class="CheckoutPage-event-date">{{ checkoutData.eventDate }}</p>
-                                            <p class="CheckoutPage-event-venue">{{ checkoutData.eventVenue }}</p>
+                                            <h3 class="CheckoutPage-event-title">{{ checkoutData?.eventTitle }}</h3>
+                                            <p class="CheckoutPage-event-date">{{ checkoutData?.eventDate }}</p>
+                                            <p class="CheckoutPage-event-venue">{{ checkoutData?.eventVenue }}</p>
                                         </div>
                                     </div>
 
@@ -206,7 +210,7 @@
                                     <div class="CheckoutPage-items">
                                         <h4 class="CheckoutPage-items-title">{{ trans('checkoutPage.your_tickets') }}</h4>
                                         <div
-                                            v-for="item in checkoutData.items"
+                                            v-for="item in checkoutData?.items"
                                             :key="item.id"
                                             class="CheckoutPage-item"
                                         >
@@ -224,14 +228,14 @@
                                         <div class="CheckoutPage-total-line">
                                             <span class="CheckoutPage-total-label">{{ trans('checkoutPage.subtotal') }}</span>
                                             <span class="CheckoutPage-total-value">
-                        {{ checkoutData.subtotal.formatted() }}
-                      </span>
+                                                {{ checkoutData?.subtotal?.formatted() }}
+                                            </span>
                                         </div>
                                         <div class="CheckoutPage-total-line">
                                             <span class="CheckoutPage-total-label">{{ trans('checkoutPage.service_fee') }}</span>
                                             <span class="CheckoutPage-total-value">
-                        {{ checkoutData.serviceFee.formatted() }}
-                      </span>
+                                                {{ checkoutData?.serviceFee?.formatted() }}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -239,8 +243,8 @@
                                     <div class="CheckoutPage-final-total">
                                         <span class="CheckoutPage-final-total-label">{{ trans('checkoutPage.total') }}</span>
                                         <span class="CheckoutPage-final-total-value">
-                      {{ checkoutData.total.formatted() }}
-                    </span>
+                                            {{ checkoutData?.total?.formatted() }}
+                                        </span>
                                     </div>
 
                                     <!-- Desktop Submit -->
@@ -259,13 +263,21 @@
                 </div>
             </main>
         </div>
+
+        <Modal v-if="showTermsModal" @close="showTermsModal = false">
+            <TermsAndConditions />
+        </Modal>
+
+        <Modal v-if="showPrivacyModal" @close="showPrivacyModal = false">
+            <PrivacyPolicy />
+        </Modal>
     </MicrositeLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import MicrositeLayout from '../../layout/microsite-layout/MicrositeLayout.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
 import FormCustom from '../../ui/form/FormCustom.vue'
@@ -274,18 +286,33 @@ import InputCustom from '../../ui/input-custom/InputCustom.vue'
 import CountryDropdown from '../../ui/country-dropdown/CountryDropdown.vue'
 import BirthdateDropdown from '../../ui/birthdate-dropdown/BirthdateDropdown.vue'
 import GenderDropdown from '../../ui/gender-dropdown/GenderDropdown.vue'
+import Modal from '../../ui/modal/Modal.vue'
+import PrivacyPolicy from '../../common/legal-content/PrivacyPolicy.vue'
+import TermsAndConditions from '../../common/legal-content/TermsAndConditions.vue'
 
 import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
 import { useAppLocale } from '../../../composables/useAppLocale'
 
 import checkoutPageTranslations from './checkout-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
+import { getIpInfo } from '../../../utils/Utils.service'
 
 import useVuelidate from '@vuelidate/core'
-import { required, email, sameAs } from '@vuelidate/validators'
+import { required, email, sameAs, helpers } from '@vuelidate/validators'
 import FormRow from "../../ui/form/FormRow.vue"
+import InputCheckboxList from "../../ui/input-checkbox-list/InputCheckboxList.vue"
+import InputCheckboxListItem from "../../ui/input-checkbox-list/InputCheckboxListItem.vue"
 
 translationService.addTranslations('checkoutPage', checkoutPageTranslations)
+
+const birthdate = helpers.withMessage(
+    () => translationService.translate('formValidations.birthdate'),
+    (value: string | null) => {
+        if (!value) return true
+        const parts = value.split('-')
+        return parts.length === 3 && parts.every(part => !isNaN(Number(part)))
+    }
+)
 
 export default defineComponent({
     name: 'CheckoutPage',
@@ -300,7 +327,12 @@ export default defineComponent({
         InputCustom,
         CountryDropdown,
         BirthdateDropdown,
-        GenderDropdown
+        GenderDropdown,
+        Modal,
+        PrivacyPolicy,
+        TermsAndConditions,
+        InputCheckboxList,
+        InputCheckboxListItem
     },
 
     setup() {
@@ -326,9 +358,22 @@ export default defineComponent({
                     sameAsEmail: sameAs(this.formData.email)
                 },
                 countryCode: {},
-                postalCode: {},
-                birthdate: {},
+                postalCode: {
+                    postalCodeES: helpers.withMessage(
+                        () => translationService.translate('formValidations.postalCode'),
+                        (value: string | null) => {
+                            if (this.formData.countryCode !== 'ES' || !value) return true
+                            return /^\d{5}$/.test(value)
+                        }
+                    )
+                },
+                birthdate: {
+                    birthdate
+                },
                 gender: {}
+            },
+            acceptTerms: {
+                mustBeAccepted: sameAs(true)
             }
         }
     },
@@ -352,19 +397,31 @@ export default defineComponent({
                 confirmEmail: '',
                 firstName: '',
                 lastName: '',
-                countryCode: 'ES',
+                countryCode: null as string | null,
                 postalCode: '',
                 birthdate: null as string | null,
                 gender: null as string | null
             },
 
             acceptTerms: false,
-            isSubmitting: false
+            acceptMarketing: false,
+            isSubmitting: false,
+            showTermsModal: false,
+            showPrivacyModal: false
         }
     },
 
-    mounted() {
+    async mounted() {
         this.checkoutData = this.checkout.getCheckoutData()
+
+        try {
+            const ipInfo = await getIpInfo()
+            if (ipInfo && ipInfo.countryCode) {
+                this.formData.countryCode = ipInfo.countryCode
+            }
+        } catch (e) {
+            console.error('Failed to get IP info', e)
+        }
     },
 
     methods: {
@@ -387,11 +444,6 @@ export default defineComponent({
                 if (this.v$.$invalid) {
                     return
                 }
-            }
-
-            if (!this.acceptTerms) {
-                alert(this.trans('checkoutPage.alert_accept_terms'))
-                return
             }
 
             if (!this.checkoutData || this.checkoutData.items.length === 0) {
@@ -576,24 +628,6 @@ export default defineComponent({
         font-size: 0.875rem;
         color: var(--color-muted-foreground);
         margin: 0;
-    }
-
-    &-checkbox-wrapper {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-    }
-
-    &-checkbox {
-        margin-top: 2px;
-        cursor: pointer;
-    }
-
-    &-checkbox-label {
-        font-size: 0.875rem;
-        color: var(--color-muted-foreground);
-        line-height: 1.5;
-        cursor: pointer;
     }
 
     &-link {

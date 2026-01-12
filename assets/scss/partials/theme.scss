@@ -95,7 +95,7 @@
   /* ------------------------------------------------------------------ */
   /* Semantic tokens (LIGHT) - alineados con tu theme actual             */
   /* ------------------------------------------------------------------ */
-  --color-foreground: var(--color-N10);
+  --color-foreground: var(--color-N20);
   --color-muted-foreground: var(--color-N60);
 
   --color-background: #f9fafb;
@@ -120,6 +120,10 @@
   /* ------------------------------------------------------------------ */
   /* Gradients / shadows (tu theme actual)                               */
   /* ------------------------------------------------------------------ */
+
+  --color-text-content-gradient-start: #7181db;
+  --color-text-content-gradient-end: #4be0e7;
+
   --gradient-subtle: linear-gradient(
                   180deg,
                   hsl(220 25% 98%) 0%,

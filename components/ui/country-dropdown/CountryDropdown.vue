@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 import DropdownSelect from '../dropdown/DropdownSelect.vue'
 import { COUNTRY_CODES } from '../../../shared/data/country-codes'
 import { useAppLocale } from '../../../composables/useAppLocale'
@@ -31,7 +31,7 @@ export default defineComponent({
 
   props: {
     modelValue: {
-      type: String,
+      type: String as PropType<string | null>,
       default: null
     },
     readonly: {

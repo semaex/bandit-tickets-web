@@ -177,8 +177,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@use '../../../assets/scss/mixins' as *;
-
 $image-border-radius: 4px;
 $image-height: 60px;
 $image-height-sm: 50px;
@@ -226,7 +224,7 @@ $image-height-sm: 50px;
         font-size: var(--input-font-size);
         border: var(--input-border);
         border-radius: var(--input-border-radius);
-        background-color: var(--color-N100);
+        background-color: var(--color-input-background);
         padding: var(--input-padding);
         padding-right: calc(2.4em);
         transition: 0.15s;
@@ -322,7 +320,7 @@ $image-height-sm: 50px;
     }
 }
 
-@include mobile {
+@media (max-width: 767.98px) {
 
     .DropdownSelect {
 

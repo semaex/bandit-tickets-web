@@ -78,7 +78,24 @@ export default defineComponent({
 
   computed: {
     dayOptions() {
-      return Array.from({ length: 31 }, (_, i) => ({
+      if (!this.month) {
+        return Array.from({ length: 31 }, (_, i) => ({
+          value: i + 1,
+          label: String(i + 1)
+        }))
+      }
+
+      const daysInMonth = new Date(this.year || 2000, this.month, 0).getDate()
+      
+      // If selected day is greater than days in month, reset it
+      if (this.day && this.day > daysInMonth) {
+        this.$nextTick(() => {
+          this.day = null
+          this.updateValue()
+        })
+      }
+
+      return Array.from({ length: daysInMonth }, (_, i) => ({
         value: i + 1,
         label: String(i + 1)
       }))
@@ -112,14 +129,19 @@ export default defineComponent({
       this.updateValue()
     },
     updateValue() {
-      if (this.day && this.month && this.year) {
-        const formattedDate = `${this.year}-${String(this.month).padStart(2, '0')}-${String(this.day).padStart(2, '0')}`
-        this.$emit('update:modelValue', formattedDate)
-        this.$emit('change', formattedDate)
-      } else {
+      if (!this.day && !this.month && !this.year) {
         this.$emit('update:modelValue', null)
         this.$emit('change', null)
+        return
       }
+
+      const y = this.year || 'yyyy'
+      const m = this.month ? String(this.month).padStart(2, '0') : 'mm'
+      const d = this.day ? String(this.day).padStart(2, '0') : 'dd'
+
+      const formattedDate = `${y}-${m}-${d}`
+      this.$emit('update:modelValue', formattedDate)
+      this.$emit('change', formattedDate)
     }
   }
 })

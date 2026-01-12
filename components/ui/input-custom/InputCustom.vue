@@ -17,6 +17,7 @@
       :name="name"
       :autocomplete="autocomplete"
       :readonly="readonly"
+      :maxlength="maxlength"
       @input="handleInput"
       @focus="$emit('focus', $event)"
       @blur="$emit('blur', $event)"
@@ -71,6 +72,10 @@ export default defineComponent({
     },
     autocomplete: {
       type: String,
+      default: undefined
+    },
+    maxlength: {
+      type: [String, Number],
       default: undefined
     },
     icon: {

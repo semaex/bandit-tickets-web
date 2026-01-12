@@ -33,7 +33,8 @@
     "service_fee": "Service fee",
     "total": "Total",
     "alert_complete_fields": "Please complete all fields.",
-    "alert_accept_terms": "You must accept the terms and conditions to continue."
+    "alert_accept_terms": "You must accept the terms and conditions to continue.",
+    "accept_marketing": "I want to receive notices from the organizer about similar events or events of interest."
   },
   "es-ES": {
     "back": "Volver",
@@ -69,7 +70,8 @@
     "service_fee": "Gastos de gestión",
     "total": "Total",
     "alert_complete_fields": "Por favor, completa todos los campos.",
-    "alert_accept_terms": "Debes aceptar los términos y condiciones para continuar."
+    "alert_accept_terms": "Debes aceptar los términos y condiciones para continuar.",
+    "accept_marketing": "Quiero recibir avisos del organizador sobre eventos similares o de mi interés."
   },
   "ca-ES": {
     "back": "Tornar",
@@ -105,7 +107,8 @@
     "service_fee": "Despeses de gestió",
     "total": "Total",
     "alert_complete_fields": "Si us plau, completa tots els camps.",
-    "alert_accept_terms": "Has d'acceptar els termes i condicions per continuar."
+    "alert_accept_terms": "Has d'acceptar els termes i condicions per continuar.",
+    "accept_marketing": "Vull rebre avisos de l'organitzador sobre esdeveniments similars o del meu interès."
   },
   "eu-ES": {
     "back": "Itzuli",
@@ -141,7 +144,8 @@
     "service_fee": "Kudeaketa gastuak",
     "total": "Guztira",
     "alert_complete_fields": "Mesedez, bete eremu guztiak.",
-    "alert_accept_terms": "Terminoak eta baldintzak onartu behar dituzu jarraitzeko."
+    "alert_accept_terms": "Terminoak eta baldintzak onartu behar dituzu jarraitzeko.",
+    "accept_marketing": "Antolatzailearen oharrak jaso nahi ditut antzeko ekitaldiei edo nire interesekoei buruz."
   },
   "gl-ES": {
     "back": "Volver",
@@ -177,7 +181,7 @@
     "service_fee": "Gastos de xestión",
     "total": "Total",
     "alert_complete_fields": "Por favor, completa todos os campos.",
-    "alert_accept_terms": "Debes aceptar os termos e condicións para continuar."
+    "alert_accept_terms": "Debes aceptar os termos e condicións para continuar.",
+    "accept_marketing": "Quero recibir avisos do organizador sobre eventos similares ou do meu interese."
   }
 }
-

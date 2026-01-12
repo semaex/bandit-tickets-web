@@ -171,7 +171,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
+import MicrositeLayout from '../../layout/microsite-layout/MicrositeLayout.vue'
 import { useCheckout } from '../../../composables/useCheckout'
 import { useAppLocale } from '../../../composables/useAppLocale'
 import paymentResultPageTranslations from './payment-result-page.i18n.json'

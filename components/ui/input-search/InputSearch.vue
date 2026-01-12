@@ -7,7 +7,7 @@
                @input="handleInput"
         >
         <icon class="InputSearch-searchIcon" name="search"/>
-        <icon class="InputSearch-clearButton" name="input-clear" @click="clear" v-show="inputValue !== ''"/>
+        <icon class="InputSearch-clearButton" name="input-clear" @click="clear" v-show="inputValue !== ''" :clickable="true"/>
     </div>
 </template>
 
@@ -21,12 +21,12 @@ export default defineComponent({
         Icon
     },
     props: {
-        value: {type: String, required: false},
+        modelValue: {type: String, required: false},
         placeholder: {type: String}
     },
     data() {
         return {
-            inputValue: (this.value || '') as string
+            inputValue: (this.modelValue || '') as string
         }
     },
     mounted() {
@@ -51,11 +51,11 @@ export default defineComponent({
         }
     },
     watch: {
-        value() {
-            this.inputValue = (this.value || '') as string
+        modelValue() {
+            this.inputValue = (this.modelValue || '') as string
         },
         inputValue() {
-            this.$emit('input', this.inputValue)
+            this.$emit('update:modelValue', this.inputValue)
         }
     }
 })

@@ -6,7 +6,10 @@
     "sameAsPassword": "La contraseña no es la misma",
     "sameAsEmail": "Los emails no coinciden",
     "uploadMaxSize": "El tamaño máximo del fichero debe ser de {{maxSize}}",
-    "checkRequired": ""
+    "checkRequired": "",
+    "mustBeAccepted": "Debes aceptar los términos y la política de privacidad.",
+    "birthdate": "La fecha de nacimiento no es válida",
+    "postalCodeES": "El código postal debe tener 5 números"
   },
   "en-GB": {
     "required": "Field required",
@@ -15,7 +18,10 @@
     "sameAsPassword": "Password is not the same",
     "sameAsEmail": "Emails do not match",
     "uploadMaxSize": "Maximum file size must be {{maxSize}}",
-    "checkRequired": ""
+    "checkRequired": "",
+    "mustBeAccepted": "You must accept the terms and privacy policy.",
+    "birthdate": "Birthdate is not valid",
+    "postalCodeES": "Postal code must be 5 digits"
   },
   "ca-ES": {
     "required": "Camp obligatori",
@@ -24,7 +30,10 @@
     "sameAsPassword": "La contrasenya no és la mateixa",
     "sameAsEmail": "Els emails no coincideixen",
     "uploadMaxSize": "La mida màxima del fitxer ha de ser de {{maxSize}}",
-    "checkRequired": ""
+    "checkRequired": "",
+    "mustBeAccepted": "Has d'acceptar els termes i la política de privadesa.",
+    "birthdate": "La data de naixement no és vàlida",
+    "postalCodeES": "El codi postal ha de tenir 5 números"
   },
   "eu-ES": {
     "required": "Eremua derrigorrezkoa",
@@ -33,7 +42,10 @@
     "sameAsPassword": "Pasahitza ez da bera",
     "sameAsEmail": "Emailak ez datoz bat",
     "uploadMaxSize": "Fitxategiaren tamaina maximoa {{maxSize}} izan behar du",
-    "checkRequired": ""
+    "checkRequired": "",
+    "mustBeAccepted": "Baldintzak eta pribatutasun-politika onartu behar dituzu.",
+    "birthdate": "Jaiotze-data ez da baliozkoa",
+    "postalCodeES": "Posta-kodeak 5 zenbaki izan behar ditu"
   },
   "gl-ES": {
     "required": "Campo obrigatorio",
@@ -42,7 +54,9 @@
     "sameAsPassword": "A contrasinal non é a mesma",
     "sameAsEmail": "Os emails non coinciden",
     "uploadMaxSize": "O tamaño máximo do ficheiro debe ser de {{maxSize}}",
-    "checkRequired": ""
+    "checkRequired": "",
+    "mustBeAccepted": "Debes aceptar os termos e a política de privacidade.",
+    "birthdate": "A data de nacemento non é válida",
+    "postalCodeES": "O código postal debe ter 5 números"
   }
 }
-

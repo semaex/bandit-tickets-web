@@ -288,11 +288,11 @@
 <script lang="ts">
 import { defineComponent, nextTick } from 'vue'
 
-import MicrositeLayout from '../../layout/MicrositeLayout/MicrositeLayout.vue'
-import EventInfo from '../../common/EventInfo/EventInfo.vue'
-import TicketCard from '../../common/TicketCard/TicketCard.vue'
-import GenreChip from '../../common/GenreChip/GenreChip.vue'
-import EventPurchaseInfo from '../../common/EventPurchaseInfo/EventPurchaseInfo.vue'
+import MicrositeLayout from '../../layout/microsite-layout/MicrositeLayout.vue'
+import EventInfo from '../../common/event-info/EventInfo.vue'
+import TicketCard from '../../common/ticket-card/TicketCard.vue'
+import GenreChip from '../../common/genre-chip/GenreChip.vue'
+import EventPurchaseInfo from '../../common/event-purchase-info/EventPurchaseInfo.vue'
 import ButtonCustom from '../../ui/button-custom/ButtonCustom.vue'
 import Icon from '../../ui/icon/Icon.vue'
 import Loader from '../../ui/loader/Loader.vue'

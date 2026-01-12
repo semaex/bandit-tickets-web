@@ -1,8 +1,8 @@
 <template>
   <div class="FormGroup" :class="classes">
-    <label v-if="label">
+    <label v-if="label" class="FormGroup-label">
       <span v-html="label"></span>
-      <span v-if="required">*</span>
+      <span v-if="required" class="FormGroup-label-required">*</span>
     </label>
     <div>
       <div class="FormGroup-body" ref="body">
@@ -104,7 +104,6 @@ export default {
 </script>
 
 <style lang="scss">
-@use '../../../assets/scss/mixins' as *;
 
 $label-width-xl: 200px;
 
@@ -119,7 +118,7 @@ $label-width-xl: 200px;
         flex: 1;
     }
 
-    > label {
+    > .FormGroup-label {
         display: inline-block;
         font-weight: normal;
         padding-right: 1.3em;
@@ -127,6 +126,7 @@ $label-width-xl: 200px;
         text-align: right;
         vertical-align: top;
         width: $label-width-xl;
+        color: var(--color-N50);
 
         & + * {
             margin-left: 0;
@@ -144,6 +144,11 @@ $label-width-xl: 200px;
 
         &.label-top-valign {
             vertical-align: top;
+        }
+
+        > .FormGroup-label-required {
+            margin-left: 0.3em;
+            color: var(--color-primary);
         }
     }
 
@@ -241,7 +246,8 @@ $label-width-xl: 200px;
         select,
         textarea,
         input[type='checkbox']:before,
-        input[type='radio']:before {
+        input[type='radio']:before,
+        .DropdownSelect-label {
             border-color: var(--color-error);
         }
     }
@@ -292,7 +298,7 @@ $label-width-xl: 200px;
     }
 }
 
-@include mobile {
+@media (max-width: 767.98px) {
     .FormGroup {
         display: block;
 

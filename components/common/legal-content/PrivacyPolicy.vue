@@ -1,7 +1,7 @@
 <template>
-    <SimplePage :title="trans('privacyPolicy.title')">
+ <TextContent>
+            <h1>Política de privacidad</h1>
 
-        <TextContent>
             <p>En Europa y en España existen normas de protección de datos destinadas a proteger su información personal, que son de obligado cumplimiento para nuestra entidad.</p>
 
             <p>Para nosotros es muy importante que usted comprenda de forma clara y transparente qué hacemos con los datos personales que nos facilita, por qué los necesitamos y
@@ -162,34 +162,28 @@
             <p>No utilizaremos sus datos para finalidades distintas a las descritas en esta política. Si fuera necesario hacerlo, le informaremos previamente y solicitaremos su
                 consentimiento expreso.</p>
         </TextContent>
-    </SimplePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import SimplePage from '../SimplePage/SimplePage.vue'
-import { useAppLocale } from '../../../composables/useAppLocale'
-import privacyPolicyTranslations from './privacy-policy.i18n.json'
-import { translationService } from '../../../services/translation.service'
-import TextContent from "../../ui/text-content/TextContent.vue"
 
-translationService.addTranslations('privacyPolicy', privacyPolicyTranslations)
+import { defineComponent } from 'vue'
+import { useAppLocale } from '../../../composables/useAppLocale'
+import TextContent from '../../ui/text-content/TextContent.vue'
 
 export default defineComponent({
-    name: 'PrivacyPolicyPage',
+    name: 'PrivacyPolicy',
 
     components: {
-        TextContent,
-        SimplePage
+        TextContent
     },
 
     data() {
-        const {trans, appLocale} = useAppLocale()
+        const {appLocale} = useAppLocale()
 
         return {
-            trans,
             appLocale
         }
     }
 })
+
 </script>
