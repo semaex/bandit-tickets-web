@@ -1,10 +1,14 @@
 <template>
   <div class="MicrositeLayout">
     <slot />
+    <ClientOnly>
+      <ToastNotifications />
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import ToastNotifications from '../../common/toast-notifications/ToastNotifications.vue'
 </script>
 
 <style lang="scss">

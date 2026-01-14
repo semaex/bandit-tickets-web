@@ -15,14 +15,14 @@ export default defineComponent({
     },
     props: {
         icon: {type: String, required: true},
-        theme: {type: String as () => 'dark' | 'light' | undefined, required: false, validator: (value: string) => ['dark', 'light'].indexOf(value) !== -1},
+        inverted: {type: Boolean, default: false},
         size: {type: String as () => 'md' | 'sm' | undefined, required: false, validator: (value: string) => ['md', 'sm'].indexOf(value) !== -1},
         minimal: {type: Boolean, default: false}
     },
     computed: {
         classes(): Record<string, boolean> {
             return {
-                'IconButton--dark': this.theme === 'dark',
+                'IconButton--inverted': this.inverted,
                 'IconButton--sm': this.size === 'sm',
                 'IconButton--minimal': this.minimal
             }
@@ -33,39 +33,25 @@ export default defineComponent({
 
 <style lang="scss">
 .IconButton {
-    display: inline-block;
-    vertical-align: baseline;
-    color: var(--color-muted-foreground, #6b7280);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-N60);
     transition: var(--transition-base, 0.2s);
-    width: 2.5em;
-    height: 2.5em;
-    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    border-radius: 3px;
     cursor: pointer;
     position: relative;
-
-    .Icon {
-        line-height: 1;
-        height: 1em;
-        display: inline-block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        i {
-            height: 1em;
-            display: inline-block;
-            line-height: 1;
-        }
-    }
+    border:1px solid transparent;
 
     &:hover {
-        color: var(--color-foreground, #1a1a1a);
-        border: none;
-        background-color: rgba(0, 0, 0, 0.05);
+        color: var(--color-N30);
+        background-color: rgba(var(--color-N0-rgb), 0.05);
+        border:1px solid rgba(var(--color-N0-rgb), 0.1);
     }
 
-    &--dark {
+    &--inverted {
         color: var(--color-foreground, #1a1a1a);
         
         &:hover {

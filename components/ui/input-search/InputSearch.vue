@@ -31,8 +31,9 @@ export default defineComponent({
     },
     mounted() {
         ['keyup', 'keydown', 'keypress', 'focus', 'blur'].forEach(event => {
-            if (this.$refs.input) {
-                (this.$refs.input as HTMLInputElement).addEventListener(event, ($event: Event) => this.$emit(event, $event));
+            const inputRef = this.$refs.input as HTMLInputElement | undefined
+            if (inputRef) {
+                inputRef.addEventListener(event, ($event: Event) => this.$emit(event, $event));
             }
         });
     },
@@ -45,8 +46,9 @@ export default defineComponent({
         },
         clear() {
             this.inputValue = ''
-            if (this.$refs.input) {
-                (this.$refs.input as HTMLInputElement).focus()
+            const inputRef = this.$refs.input as HTMLInputElement | undefined
+            if (inputRef) {
+                inputRef.focus()
             }
         }
     },

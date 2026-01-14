@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import type { Money } from '../shared/Money'
 
 export interface CartItem {
-  id: string
+  ticketTypeId: string
   name: string
   price: Money
   quantity: number
@@ -15,6 +15,7 @@ export interface CheckoutData {
   serviceFee: Money
   total: Money
   eventSlug: string
+  eventId: string
   eventTitle: string
   eventDate: string
   eventVenue: string
@@ -22,7 +23,7 @@ export interface CheckoutData {
 
 export interface PaymentData {
   success: boolean
-  orderNumber?: string
+  orderId?: string
   eventTitle?: string
   eventDate?: string
   eventVenue?: string

@@ -132,7 +132,6 @@
                                                     id="birthdate"
                                                     v-model="formData.birthdate"
                                                 />
-                                                {{ formData.birthdate }}
                                             </FormGroup>
 
                                             <FormGroup
@@ -211,7 +210,7 @@
                                         <h4 class="CheckoutPage-items-title">{{ trans('checkoutPage.your_tickets') }}</h4>
                                         <div
                                             v-for="item in checkoutData?.items"
-                                            :key="item.id"
+                                            :key="item.ticketTypeId"
                                             class="CheckoutPage-item"
                                         >
                       <span class="CheckoutPage-item-name">
@@ -302,6 +301,9 @@ import { required, email, sameAs, helpers } from '@vuelidate/validators'
 import FormRow from "../../ui/form/FormRow.vue"
 import InputCheckboxList from "../../ui/input-checkbox-list/InputCheckboxList.vue"
 import InputCheckboxListItem from "../../ui/input-checkbox-list/InputCheckboxListItem.vue"
+import { Uuid } from '../../../shared/Uuid'
+import { errorFeedback } from '../../../utils/error-feedback'
+import { submitCheckout } from '../../../public-model/Checkout/Checkout.services'
 
 translationService.addTranslations('checkoutPage', checkoutPageTranslations)
 
@@ -379,12 +381,13 @@ export default defineComponent({
     },
 
     data() {
-        const {trans} = useAppLocale()
+        const {trans, appLocale} = useAppLocale()
         const checkout = useCheckout()
 
         return {
             // i18n
             trans,
+            appLocale,
 
             // composable (para no llamarlo 3 veces)
             checkout,
@@ -452,27 +455,53 @@ export default defineComponent({
             }
 
             this.isSubmitting = true
+            const orderId = Uuid.random().value()
 
-            // Simulate payment processing
-            setTimeout(() => {
-                // importante: tu composable tiene setPaymentData (lo usabas antes)
-                const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`
-
-                this.checkout.setPaymentData({
-                    success: true,
-                    orderNumber,
-                    eventTitle: this.checkoutData?.eventTitle,
-                    eventDate: this.checkoutData?.eventDate,
-                    eventVenue: this.checkoutData?.eventVenue,
-                    items: this.checkoutData?.items.map((item: any) => ({
-                        name: item.name,
+            try {
+                await submitCheckout({
+                    buyer: {
+                        ...this.formData,
+                        marketingOptIn: this.acceptMarketing,
+                        locale: this.appLocale
+                    },
+                    items: this.checkoutData.items.map((item: any) => ({
+                        ticketTypeId: item.ticketTypeId,
                         quantity: item.quantity
                     })),
-                    email: this.formData.email
+                    eventId: this.checkoutData.eventId,
+                    orderId: orderId,
+                    deviceUserAgent: navigator.userAgent
                 })
 
-                this.$router.push('/payment-result')
-            }, 1500)
+                alert(this.trans('checkoutPage.purchase_success'))
+                return
+
+                // const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`
+
+                // this.checkout.setPaymentData({
+                //     success: true,
+                    //     orderNumber,
+                    //     eventTitle: this.checkoutData?.eventTitle,
+                    //     eventDate: this.checkoutData?.eventDate,
+                    //     eventVenue: this.checkoutData?.eventVenue,
+                    //     items: this.checkoutData?.items.map((item: any) => ({
+                    //         name: item.name,
+                    //         quantity: item.quantity
+                    //     })),
+                    //     email: this.formData.email
+                    // })
+
+                    // this.$router.push('/payment-result')
+                // }
+            } catch (error: any) {
+                if (error.message === 'order_insufficient_stock') {
+                    errorFeedback(this.trans('checkoutPage.error_order_insufficient_stock_text'), this.trans('checkoutPage.error_order_insufficient_stock_title'))
+                } else {
+                    errorFeedback(error.message)
+                }
+            } finally {
+                this.isSubmitting = false
+            }
         }
     }
 })

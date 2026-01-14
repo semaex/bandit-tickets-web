@@ -654,7 +654,7 @@ export default defineComponent({
         const { setCheckoutData } = useCheckout()
         setCheckoutData({
           items: this.selectedTicketTypes.map((ticketType: TicketTypeView) => ({
-            id: ticketType.id.toString(),
+            ticketTypeId: ticketType.id.toString(),
             name: this.getTicketName(ticketType),
             price: ticketType.price!,
             quantity: this.quantities[ticketType.id.toString()]
@@ -664,6 +664,7 @@ export default defineComponent({
           serviceFee: this.serviceFee,
           total: this.totalPrice,
           eventSlug: this.slug,
+          eventId: this.eventView!.id.toString(),
           eventTitle: this.eventView?.title.valueForLocaleOrAutoFallback(this.currentLocale) || '',
           eventDate: this.eventDate,
           eventVenue: `${this.eventVenue}, ${this.eventCity}`

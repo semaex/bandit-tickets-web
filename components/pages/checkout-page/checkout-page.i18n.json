@@ -34,7 +34,11 @@
     "total": "Total",
     "alert_complete_fields": "Please complete all fields.",
     "alert_accept_terms": "You must accept the terms and conditions to continue.",
-    "accept_marketing": "I want to receive notices from the organizer about similar events or events of interest."
+    "accept_marketing": "I want to receive notices from the organizer about similar events or events of interest.",
+    "error_processing": "An error occurred while processing your purchase. Please try again.",
+    "purchase_success": "Everything went well! Your purchase has been processed successfully.",
+    "error_order_insufficient_stock_title": "No tickets available",
+    "error_order_insufficient_stock_text": "It is possible that tickets ran out while you were placing your order."
   },
   "es-ES": {
     "back": "Volver",
@@ -71,7 +75,11 @@
     "total": "Total",
     "alert_complete_fields": "Por favor, completa todos los campos.",
     "alert_accept_terms": "Debes aceptar los términos y condiciones para continuar.",
-    "accept_marketing": "Quiero recibir avisos del organizador sobre eventos similares o de mi interés."
+    "accept_marketing": "Quiero recibir avisos del organizador sobre eventos similares o de mi interés.",
+    "error_processing": "Ha ocurrido un error al procesar tu compra. Por favor, inténtalo de nuevo.",
+    "purchase_success": "¡Todo ha ido bien! Tu compra ha sido procesada con éxito.",
+    "error_order_insufficient_stock_title": "No hay entradas disponibles",
+    "error_order_insufficient_stock_text": "Es posible que mientras hacías el pedido se hayan agotado"
   },
   "ca-ES": {
     "back": "Tornar",
@@ -108,7 +116,11 @@
     "total": "Total",
     "alert_complete_fields": "Si us plau, completa tots els camps.",
     "alert_accept_terms": "Has d'acceptar els termes i condicions per continuar.",
-    "accept_marketing": "Vull rebre avisos de l'organitzador sobre esdeveniments similars o del meu interès."
+    "accept_marketing": "Vull rebre avisos de l'organitzador sobre esdeveniments similars o del meu interès.",
+    "error_processing": "Ha sorgit un error en processar la teva compra. Si us plau, torna-ho a intentar.",
+    "purchase_success": "Tot ha anat bé! La teva compra ha estat processada amb èxit.",
+    "error_order_insufficient_stock_title": "No hi ha entrades disponibles",
+    "error_order_insufficient_stock_text": "És possible que mentre feies la comanda s'hagin esgotat"
   },
   "eu-ES": {
     "back": "Itzuli",
@@ -145,7 +157,11 @@
     "total": "Guztira",
     "alert_complete_fields": "Mesedez, bete eremu guztiak.",
     "alert_accept_terms": "Terminoak eta baldintzak onartu behar dituzu jarraitzeko.",
-    "accept_marketing": "Antolatzailearen oharrak jaso nahi ditut antzeko ekitaldiei edo nire interesekoei buruz."
+    "accept_marketing": "Antolatzailearen oharrak jaso nahi ditut antzeko ekitaldiei edo nire interesekoei buruz.",
+    "error_processing": "Errore bat gertatu da zure erosketa prozesatzean. Mesedez, saiatu berriro.",
+    "purchase_success": "Dena ondo joan da! Zure erosketa recte prozesatu da.",
+    "error_order_insufficient_stock_title": "Ez dago sarrerarik eskuragarri",
+    "error_order_insufficient_stock_text": "Baliteke eskaera egiten ari zinen bitartean agortu izana"
   },
   "gl-ES": {
     "back": "Volver",
@@ -182,6 +198,10 @@
     "total": "Total",
     "alert_complete_fields": "Por favor, completa todos os campos.",
     "alert_accept_terms": "Debes aceptar os termos e condicións para continuar.",
-    "accept_marketing": "Quero recibir avisos do organizador sobre eventos similares ou do meu interese."
+    "accept_marketing": "Quero recibir avisos do organizador sobre eventos similares ou do meu interese.",
+    "error_processing": "Produciuse un erro ao procesar a túa compra. Por favor, inténtao de novo.",
+    "purchase_success": "Todo saíu ben! A túa compra foi procesada con éxito.",
+    "error_order_insufficient_stock_title": "Non hai entradas dispoñibles",
+    "error_order_insufficient_stock_text": "É posible que mentres facías o pedido se esgotaran"
   }
 }

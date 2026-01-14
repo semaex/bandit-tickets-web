@@ -58,11 +58,13 @@ export class BffApiClient {
 
       return response as T
     } catch (error: any) {
-      if (error.data) {
-        throw error
+      const errorCode = error.data?.data?.errorCode || error.data?.errorCode
+      
+      if (errorCode) {
+        error.message = errorCode
       }
 
-      throw new Error(error.message || `BFF API request failed: ${method} ${fullUrl}`)
+      throw error
     }
   }
 }

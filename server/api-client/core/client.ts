@@ -1,11 +1,5 @@
-interface CoreApiResponse<T = any> {
-  status: number
-  message: string | null
-  data: T
-}
-
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   headers?: Record<string, string>
   body?: any
 }
@@ -14,6 +8,17 @@ export interface RawResponse {
   buffer: Buffer
   statusCode: number
   headers: Record<string, string | string[]>
+}
+
+export class CoreApiError extends Error {
+  constructor(
+    public statusCode: number,
+    public errorCode: string | null,
+    message: string
+  ) {
+    super(message)
+    this.name = 'CoreApiError'
+  }
 }
 
 export class CoreApiClient {
@@ -136,7 +141,7 @@ export class CoreApiClient {
         headers['X-API-Key'] = this.apiKey
       }
 
-      const response = await new Promise<CoreApiResponse<T>>((resolve, reject) => {
+      const response = await new Promise<any>((resolve, reject) => {
         const requestOptions = {
           hostname,
           port,
@@ -156,13 +161,33 @@ export class CoreApiClient {
           
           res.on('end', () => {
             try {
-              const jsonData = JSON.parse(data) as CoreApiResponse<T>
-              
               if (res.statusCode && res.statusCode >= 400) {
-                reject(new Error(`HTTP ${res.statusCode}: ${jsonData.message || 'Request failed'}`))
+                let jsonData: any = null
+                try {
+                  jsonData = JSON.parse(data)
+                } catch (e) {
+                  // If not JSON, use the raw data if it's small, otherwise a generic message
+                  console.error(`Core API returned non-JSON error [${res.statusCode}]:`, data.substring(0, 500))
+                }
+                
+                console.error(`Core API Error [${method} ${endpoint}]:`, {
+                  statusCode: res.statusCode,
+                  data: jsonData || data.substring(0, 200)
+                })
+
+                const errorMessage = jsonData?.error?.message || jsonData?.message || jsonData?.detail || jsonData?.title || (typeof data === 'string' && data.length > 0 ? data.substring(0, 100) : 'Request failed')
+                const errorCode = jsonData?.error?.code || jsonData?.code || null
+                
+                reject(new CoreApiError(res.statusCode, errorCode, errorMessage))
                 return
               }
-              
+
+              if (data === '') {
+                resolve({})
+                return
+              }
+
+              const jsonData = JSON.parse(data)
               resolve(jsonData)
             } catch (e) {
               reject(new Error(`Failed to parse response: ${e}`))
@@ -181,11 +206,7 @@ export class CoreApiClient {
         req.end()
       })
 
-      if (!response.data) {
-        throw new Error('Invalid response format from Core API')
-      }
-
-      return response.data
+      return response
     } catch (error: any) {
       throw error
     }
