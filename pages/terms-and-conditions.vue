@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import SimplePage from "../components/pages/simple-page/SimplePage.vue"
+import SimplePage from "../components/pages/simple/SimplePage.vue"
 import TermsAndConditions from "../components/common/legal-content/TermsAndConditions.vue"
 
 defineI18nRoute({

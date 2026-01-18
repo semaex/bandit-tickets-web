@@ -38,8 +38,8 @@ export default defineComponent({
     justify-content: center;
     color: var(--color-N60);
     transition: var(--transition-base, 0.2s);
-    width: 2em;
-    height: 2em;
+    width: 1.6em;
+    height: 1.6em;
     border-radius: 3px;
     cursor: pointer;
     position: relative;

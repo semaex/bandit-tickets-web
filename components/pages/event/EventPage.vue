@@ -669,7 +669,7 @@ export default defineComponent({
           eventDate: this.eventDate,
           eventVenue: `${this.eventVenue}, ${this.eventCity}`
         })
-        this.$router.push('/checkout')
+        this.$router.push('/checkout/confirm')
       }
     },
 

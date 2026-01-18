@@ -24,7 +24,7 @@ export interface CorePromoterProfileJson {
   defaultBuyerFeeMode: string | null
   defaultPromoterAgreementId: string | null
   forcedPromoterAgreementId: string | null
-  paymentGatewaySettings: Record<string, any> | null
+  paymentGatewayId: string | null
   createdAt: string
   updatedAt: string
 }
@@ -47,7 +47,7 @@ export function corePromoterProfileFromJson(json: CorePromoterProfileJson): Core
     json.defaultBuyerFeeMode ? (json.defaultBuyerFeeMode as BuyerFeeMode) : null,
     json.defaultPromoterAgreementId ? Uuid.fromString(json.defaultPromoterAgreementId) : null,
     json.forcedPromoterAgreementId ? Uuid.fromString(json.forcedPromoterAgreementId) : null,
-    json.paymentGatewaySettings,
+    json.paymentGatewayId ? Uuid.fromString(json.paymentGatewayId) : null,
     new Date(json.createdAt),
     new Date(json.updatedAt)
   )

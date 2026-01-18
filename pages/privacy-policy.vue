@@ -7,7 +7,7 @@
 <script lang="ts">
 
 import { defineComponent } from "vue"
-import SimplePage from "../components/pages/simple-page/SimplePage.vue"
+import SimplePage from "../components/pages/simple/SimplePage.vue"
 import PrivacyPolicy from "../components/common/legal-content/PrivacyPolicy.vue"
 
 defineI18nRoute({

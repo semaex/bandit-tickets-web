@@ -1,8 +1,8 @@
-import { Email } from '../../shared/Email'
-import { createCoreBuyer, findCoreBuyerByEmail, updateCoreBuyer } from '../core-model/Buyer/CoreBuyer.services'
-import { createCoreOrder } from '../core-model/Order/CoreOrder.services'
-import { Uuid } from '../../shared/Uuid'
-import { handleApiError } from '../utils/errors'
+import { Email } from '../../../shared/Email'
+import { createCoreBuyer, findCoreBuyerByEmail, updateCoreBuyer } from '../../core-model/Buyer/CoreBuyer.services'
+import { createCoreOrder } from '../../core-model/Order/CoreOrder.services'
+import { Uuid } from '../../../shared/Uuid'
+import { handleApiError } from '../../utils/errors'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
 
     // Step C — Update buyer (PUT partial)
     // Only if not recently created and has fields to update
-    if (!buyerJustCreated) {
+    if (!buyerJustCreated && buyerId) {
       const updateData: any = {}
       
       for (const [key, value] of Object.entries(buyerData)) {
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      if (Object.keys(updateData).length > 0) {
+      if (Object.keys(updateData).length > 0 && buyerId) {
         await updateCoreBuyer(buyerId, updateData)
       }
     }
@@ -98,9 +98,6 @@ export default defineEventHandler(async (event) => {
     })
 
     setResponseStatus(event, 201)
-    return {
-      orderId: orderId
-    }
 
   } catch (error: any) {
     handleApiError(error)

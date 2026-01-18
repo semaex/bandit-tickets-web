@@ -190,7 +190,7 @@ interface PaymentData {
 }
 
 export default defineComponent({
-  name: 'PaymentResultPage',
+  name: 'CheckoutFinishPage',
 
   components: {
     MicrositeLayout
@@ -223,7 +223,7 @@ export default defineComponent({
     },
 
     handleRetry () {
-      this.$router.push('/checkout')
+      this.$router.push('/checkout/confirm')
     }
   }
 })

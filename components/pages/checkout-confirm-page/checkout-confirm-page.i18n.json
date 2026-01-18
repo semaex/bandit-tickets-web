@@ -36,6 +36,8 @@
     "alert_accept_terms": "You must accept the terms and conditions to continue.",
     "accept_marketing": "I want to receive notices from the organizer about similar events or events of interest.",
     "error_processing": "An error occurred while processing your purchase. Please try again.",
+    "error_external_payment_title": "Payment unavailable",
+    "error_external_payment_text": "There is an internal error with the external payment gateway configuration. Please try again later.",
     "purchase_success": "Everything went well! Your purchase has been processed successfully.",
     "error_order_insufficient_stock_title": "No tickets available",
     "error_order_insufficient_stock_text": "It is possible that tickets ran out while you were placing your order."
@@ -77,6 +79,8 @@
     "alert_accept_terms": "Debes aceptar los términos y condiciones para continuar.",
     "accept_marketing": "Quiero recibir avisos del organizador sobre eventos similares o de mi interés.",
     "error_processing": "Ha ocurrido un error al procesar tu compra. Por favor, inténtalo de nuevo.",
+    "error_external_payment_title": "Pago no disponible",
+    "error_external_payment_text": "Hay un error interno con la configuración del pago externo. Por favor, inténtalo de nuevo más tarde.",
     "purchase_success": "¡Todo ha ido bien! Tu compra ha sido procesada con éxito.",
     "error_order_insufficient_stock_title": "No hay entradas disponibles",
     "error_order_insufficient_stock_text": "Es posible que mientras hacías el pedido se hayan agotado"
@@ -118,6 +122,8 @@
     "alert_accept_terms": "Has d'acceptar els termes i condicions per continuar.",
     "accept_marketing": "Vull rebre avisos de l'organitzador sobre esdeveniments similars o del meu interès.",
     "error_processing": "Ha sorgit un error en processar la teva compra. Si us plau, torna-ho a intentar.",
+    "error_external_payment_title": "Pagament no disponible",
+    "error_external_payment_text": "Hi ha un error intern amb la configuració del pagament extern. Si us plau, torna-ho a intentar més tard.",
     "purchase_success": "Tot ha anat bé! La teva compra ha estat processada amb èxit.",
     "error_order_insufficient_stock_title": "No hi ha entrades disponibles",
     "error_order_insufficient_stock_text": "És possible que mentre feies la comanda s'hagin esgotat"
@@ -159,6 +165,8 @@
     "alert_accept_terms": "Terminoak eta baldintzak onartu behar dituzu jarraitzeko.",
     "accept_marketing": "Antolatzailearen oharrak jaso nahi ditut antzeko ekitaldiei edo nire interesekoei buruz.",
     "error_processing": "Errore bat gertatu da zure erosketa prozesatzean. Mesedez, saiatu berriro.",
+    "error_external_payment_title": "Ordainketa ez dago erabilgarri",
+    "error_external_payment_text": "Barne errore bat dago kanpoko ordainketa-pasarelaren konfigurazioarekin. Mesedez, saiatu berriro beranduago.",
     "purchase_success": "Dena ondo joan da! Zure erosketa recte prozesatu da.",
     "error_order_insufficient_stock_title": "Ez dago sarrerarik eskuragarri",
     "error_order_insufficient_stock_text": "Baliteke eskaera egiten ari zinen bitartean agortu izana"
@@ -200,6 +208,8 @@
     "alert_accept_terms": "Debes aceptar os termos e condicións para continuar.",
     "accept_marketing": "Quero recibir avisos do organizador sobre eventos similares ou do meu interese.",
     "error_processing": "Produciuse un erro ao procesar a túa compra. Por favor, inténtao de novo.",
+    "error_external_payment_title": "Pago non dispoñible",
+    "error_external_payment_text": "Hai un erro interno coa configuración do pago externo. Por favor, inténtao de novo máis tarde.",
     "purchase_success": "Todo saíu ben! A túa compra foi procesada con éxito.",
     "error_order_insufficient_stock_title": "Non hai entradas dispoñibles",
     "error_order_insufficient_stock_text": "É posible que mentres facías o pedido se esgotaran"

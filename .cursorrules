@@ -51,3 +51,9 @@
 - Application runs on port 3000
 - Use `docker-compose up` to start the development environment
 
+## Doctrine ORM Mappings
+- **Doctrine mappings are auto-discovered and configured in the Kernel**
+- The Doctrine ORM mapping configuration is handled automatically in `src/Shared/Infrastructure/Symfony/Kernel.php`
+- Do not manually add Doctrine mappings to `config/packages/doctrine.yaml` - they are discovered automatically from XML files in `Infrastructure/Persistence/Doctrine/` directories
+- The Kernel's `configureDoctrineMappings` method handles all mapping discovery and configuration
+

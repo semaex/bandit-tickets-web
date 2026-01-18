@@ -292,7 +292,7 @@ import TermsAndConditions from '../../common/legal-content/TermsAndConditions.vu
 import { useCheckout, type CheckoutData } from '../../../composables/useCheckout'
 import { useAppLocale } from '../../../composables/useAppLocale'
 
-import checkoutPageTranslations from './checkout-page.i18n.json'
+import checkoutPageTranslations from './checkout-confirm-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
 import { getIpInfo } from '../../../utils/Utils.service'
 
@@ -303,7 +303,8 @@ import InputCheckboxList from "../../ui/input-checkbox-list/InputCheckboxList.vu
 import InputCheckboxListItem from "../../ui/input-checkbox-list/InputCheckboxListItem.vue"
 import { Uuid } from '../../../shared/Uuid'
 import { errorFeedback } from '../../../utils/error-feedback'
-import { submitCheckout } from '../../../public-model/Checkout/Checkout.services'
+import { checkoutCreateOrder, checkoutPreparePayment, type RedsysPaymentGatewayConfig } from '../../../public-model/Checkout/Checkout.services'
+import { PaymentGatewayProvider } from '../../../shared/PaymentGatewayProvider'
 
 translationService.addTranslations('checkoutPage', checkoutPageTranslations)
 
@@ -317,7 +318,7 @@ const birthdate = helpers.withMessage(
 )
 
 export default defineComponent({
-    name: 'CheckoutPage',
+    name: 'CheckoutConfirmPage',
 
     components: {
         FormRow,
@@ -437,6 +438,33 @@ export default defineComponent({
             }
         },
 
+        redirectToRedsys(config: { actionUrl: string, settings: { Ds_SignatureVersion: string, Ds_MerchantParameters: string, Ds_Signature: string } }) {
+            // Create a form dynamically
+            const form = document.createElement('form')
+            form.method = 'POST'
+            form.action = config.actionUrl
+            form.style.display = 'none'
+
+            // Add form fields
+            const fields = [
+                { name: 'Ds_SignatureVersion', value: config.settings.Ds_SignatureVersion },
+                { name: 'Ds_MerchantParameters', value: config.settings.Ds_MerchantParameters },
+                { name: 'Ds_Signature', value: config.settings.Ds_Signature }
+            ]
+
+            fields.forEach(field => {
+                const input = document.createElement('input')
+                input.type = 'hidden'
+                input.name = field.name
+                input.value = field.value
+                form.appendChild(input)
+            })
+
+            // Append form to body and submit
+            document.body.appendChild(form)
+            form.submit()
+        },
+
         async handleSubmit(e?: Event) {
             if (e) {
                 e.preventDefault()
@@ -450,15 +478,17 @@ export default defineComponent({
             }
 
             if (!this.checkoutData || this.checkoutData.items.length === 0) {
-                alert(this.trans('checkoutPage.empty_title'))
+                errorFeedback(this.trans('checkoutPage.empty_title'))
                 return
             }
 
             this.isSubmitting = true
             const orderId = Uuid.random().value()
+            const paymentAttemptId = Uuid.random().value()
 
             try {
-                await submitCheckout({
+                // Step 1: Create order
+                await checkoutCreateOrder({
                     buyer: {
                         ...this.formData,
                         marketingOptIn: this.acceptMarketing,
@@ -473,26 +503,29 @@ export default defineComponent({
                     deviceUserAgent: navigator.userAgent
                 })
 
-                alert(this.trans('checkoutPage.purchase_success'))
+                // Step 2: Prepare payment
+                const checkoutPaymentResponse = await checkoutPreparePayment({
+                    orderId: orderId,
+                    paymentAttemptId: paymentAttemptId
+                })
+
+                // Step 3: Redirect to payment gateway based on provider
+                if (checkoutPaymentResponse.paymentGatewayConfig.provider === PaymentGatewayProvider.REDSYS) {
+                    this.redirectToRedsys(checkoutPaymentResponse.paymentGatewayConfig as RedsysPaymentGatewayConfig)
+                    return
+                }
+
+                // For other providers (e.g., Stripe), handle accordingly
+                console.warn('Unsupported payment gateway provider:', checkoutPaymentResponse.paymentGatewayConfig.provider)
+                errorFeedback(
+                    this.trans('checkoutPage.error_external_payment_text'),
+                    this.trans('checkoutPage.error_external_payment_title')
+                )
                 return
 
-                // const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`
 
-                // this.checkout.setPaymentData({
-                //     success: true,
-                    //     orderNumber,
-                    //     eventTitle: this.checkoutData?.eventTitle,
-                    //     eventDate: this.checkoutData?.eventDate,
-                    //     eventVenue: this.checkoutData?.eventVenue,
-                    //     items: this.checkoutData?.items.map((item: any) => ({
-                    //         name: item.name,
-                    //         quantity: item.quantity
-                    //     })),
-                    //     email: this.formData.email
-                    // })
 
-                    // this.$router.push('/payment-result')
-                // }
+     
             } catch (error: any) {
                 if (error.message === 'order_insufficient_stock') {
                     errorFeedback(this.trans('checkoutPage.error_order_insufficient_stock_text'), this.trans('checkoutPage.error_order_insufficient_stock_title'))

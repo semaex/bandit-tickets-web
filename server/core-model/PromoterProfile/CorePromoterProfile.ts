@@ -24,7 +24,7 @@ export class CorePromoterProfile {
     public readonly defaultBuyerFeeMode: BuyerFeeMode | null,
     public readonly defaultPromoterAgreementId: Uuid | null,
     public readonly forcedPromoterAgreementId: Uuid | null,
-    public readonly paymentGatewaySettings: Record<string, any> | null,
+    public readonly paymentGatewayId: Uuid | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {}
