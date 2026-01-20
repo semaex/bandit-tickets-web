@@ -5,18 +5,11 @@ import { PaymentGatewayProvider } from '../../../../shared/PaymentGatewayProvide
 
 export default defineEventHandler(async (event) => {
   try {
-    const headers = getRequestHeaders(event)
-    const contentType = (headers['content-type'] || '').toString()
-
     let body: Record<string, any> = {}
+    const rawBody = (await readRawBody(event)) || ''
 
     // Redsys posts application/x-www-form-urlencoded
-    if (contentType.includes('application/x-www-form-urlencoded')) {
-      const raw = (await readRawBody(event)) || ''
-      body = parseUrlEncoded(raw)
-    } else {
-      body = (await readBody(event)) || {}
-    }
+    body = parseUrlEncoded(rawBody)
 
     const data = getValidatedRedsysCallbackData(event, body)
     if (!data) return 'OK'
@@ -52,7 +45,7 @@ export default defineEventHandler(async (event) => {
         // For Redsys callbacks we don't know the settlement amount/currency at this point
         gatewaySettlementAmount: null,
         gatewayFee: null,
-        gatewayRawResponse: merchantParams
+        gatewayRawResponse: rawBody
       })
     } else {
       console.warn('[Redsys callback] Payment not successful', {

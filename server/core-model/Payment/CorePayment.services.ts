@@ -23,7 +23,7 @@ export async function markCorePaymentAttemptAsPaid(
     gatewayTransactionId: string
     gatewaySettlementAmount: { amount?: number | null, currency?: string | null } | null
     gatewayFee: { amount: number, currency: string } | null
-    gatewayRawResponse: Record<string, any>
+    gatewayRawResponse: string
   }
 ): Promise<void> {
   const endpoint = `${BASE_URL}/attempts/${encodeURIComponent(paymentAttemptId)}/mark-as-paid`

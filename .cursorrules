@@ -51,6 +51,9 @@
 - Application runs on port 3000
 - Use `docker-compose up` to start the development environment
 
+## Integration Events (Symfony Messenger)
+- If a **transport consumer** (queue) runs but **does not trigger the expected subscriber/handler**, ensure the **integration event** is mapped in `@core/src/Shared/Infrastructure/Bus/Message/Factory/FullyQualifiedClassNameMessageFactory.php` so the message can be deserialized to the correct PHP class.
+
 ## Doctrine ORM Mappings
 - **Doctrine mappings are auto-discovered and configured in the Kernel**
 - The Doctrine ORM mapping configuration is handled automatically in `src/Shared/Infrastructure/Symfony/Kernel.php`
