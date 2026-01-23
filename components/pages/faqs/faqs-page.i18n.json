@@ -1,0 +1,53 @@
+{
+  "en-GB": {
+    "title": "FAQs",
+    "intro": "Find answers to the most common questions.",
+    "q1_title": "Where can I find my tickets?",
+    "q1_body": "After completing your purchase, you will receive an email with your tickets. You can also download the PDF from the confirmation page.",
+    "q2_title": "I didn't receive the email. What should I do?",
+    "q2_body": "Check your spam/junk folder. If you still can't find it, contact us using the contact form.",
+    "q3_title": "Can I get a refund?",
+    "q3_body": "Refunds depend on the event organizer's policy. Please review the terms and conditions for more details."
+  },
+  "es-ES": {
+    "title": "Preguntas frecuentes",
+    "intro": "Aquí encontrarás respuestas a las dudas más habituales.",
+    "q1_title": "¿Dónde puedo encontrar mis entradas?",
+    "q1_body": "Al finalizar tu compra recibirás un email con tus entradas. También puedes descargar el PDF desde la página de confirmación.",
+    "q2_title": "No he recibido el email. ¿Qué puedo hacer?",
+    "q2_body": "Revisa la carpeta de spam/correo no deseado. Si no aparece, contacta con nosotros desde el formulario.",
+    "q3_title": "¿Puedo solicitar un reembolso?",
+    "q3_body": "Las devoluciones dependen de la política del organizador. Consulta los términos y condiciones para más detalles."
+  },
+  "ca-ES": {
+    "title": "Preguntes freqüents",
+    "intro": "Aquí trobaràs respostes als dubtes més habituals.",
+    "q1_title": "On puc trobar les meves entrades?",
+    "q1_body": "En finalitzar la compra rebràs un correu amb les entrades. També pots descarregar el PDF des de la pàgina de confirmació.",
+    "q2_title": "No he rebut el correu. Què puc fer?",
+    "q2_body": "Revisa la carpeta de correu brossa. Si no hi és, contacta amb nosaltres des del formulari.",
+    "q3_title": "Puc demanar un reemborsament?",
+    "q3_body": "Les devolucions depenen de la política de l'organitzador. Consulta els termes i condicions per a més detalls."
+  },
+  "eu-ES": {
+    "title": "Ohiko galderak",
+    "intro": "Hemen ohikoenak diren galderen erantzunak aurkituko dituzu.",
+    "q1_title": "Non aurki ditzaket nire sarrerak?",
+    "q1_body": "Erosketa amaitzean mezu elektroniko bat jasoko duzu sarrerekin. PDFa baieztapen orritik ere deskarga dezakezu.",
+    "q2_title": "Ez dut mezua jaso. Zer egin dezaket?",
+    "q2_body": "Egiaztatu spam/zabor-posta karpeta. Ez badago, jarri gurekin harremanetan formularioaren bidez.",
+    "q3_title": "Itzulketa eska dezaket?",
+    "q3_body": "Itzulketak antolatzailearen politikaren araberakoak dira. Ikusi terminoak eta baldintzak xehetasun gehiagorako."
+  },
+  "gl-ES": {
+    "title": "Preguntas frecuentes",
+    "intro": "Aquí atoparás respostas ás dúbidas máis habituais.",
+    "q1_title": "Onde podo atopar as miñas entradas?",
+    "q1_body": "Ao finalizar a túa compra recibirás un correo coas entradas. Tamén podes descargar o PDF desde a páxina de confirmación.",
+    "q2_title": "Non recibín o correo. Que podo facer?",
+    "q2_body": "Revisa a carpeta de spam/correo lixo. Se non aparece, contáctanos mediante o formulario.",
+    "q3_title": "Podo solicitar un reembolso?",
+    "q3_body": "As devolucións dependen da política do organizador. Consulta os termos e condicións para máis detalles."
+  }
+}
+
