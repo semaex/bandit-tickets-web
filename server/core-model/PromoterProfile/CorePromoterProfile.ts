@@ -2,7 +2,6 @@ import { Uuid } from '../../../shared/Uuid'
 import { Url } from '../../../shared/Url'
 import { Email } from '../../../shared/Email'
 import { PhoneNumber } from '../../../shared/PhoneNumber'
-import { BuyerFeeMode } from '../../../shared/BuyerFeeMode'
 import { StringMultilanguage } from '../../../shared/StringMultilanguage'
 import { CorePromoterProfileEntityType } from './CorePromoterProfileEntityType'
 
@@ -21,7 +20,6 @@ export class CorePromoterProfile {
     public readonly supportEmail: Email | null,
     public readonly supportPhone: PhoneNumber | null,
     public readonly terms: StringMultilanguage | null,
-    public readonly defaultBuyerFeeMode: BuyerFeeMode | null,
     public readonly defaultPromoterAgreementId: Uuid | null,
     public readonly forcedPromoterAgreementId: Uuid | null,
     public readonly paymentGatewayId: Uuid | null,

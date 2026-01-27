@@ -24,20 +24,20 @@ export default defineEventHandler(async (event) => {
     const amount = attempt.amount.toArray()
 
     // Step 3: Get checkout config from payment gateway
-    const checkoutConfig = await findCorePaymentGatewayCheckoutConfig(
+    const paymentGatewayConfig = await findCorePaymentGatewayCheckoutConfig(
       paymentGatewayId,
       paymentAttemptId,
       amount
     )
 
-    if (checkoutConfig.provider === PaymentGatewayProvider.REDSYS) {
+    if (paymentGatewayConfig.provider === PaymentGatewayProvider.REDSYS) {
       await markCorePaymentAttemptAsProcessing(paymentAttemptId)
     }
 
     return {
       paymentAttemptId,
       paymentGatewayId,
-      paymentGatewayConfig: checkoutConfig
+      paymentGatewayConfig
     }
 
   } catch (error: any) {

@@ -3,7 +3,6 @@ import { Uuid } from '../../../shared/Uuid'
 import { Url } from '../../../shared/Url'
 import { Email } from '../../../shared/Email'
 import { PhoneNumber } from '../../../shared/PhoneNumber'
-import { BuyerFeeMode } from '../../../shared/BuyerFeeMode'
 import { StringMultilanguage } from '../../../shared/StringMultilanguage'
 import { CorePromoterProfileEntityType } from './CorePromoterProfileEntityType'
 
@@ -21,7 +20,6 @@ export interface CorePromoterProfileJson {
   supportEmail: string | null
   supportPhone: string | null
   terms: Record<string, string> | null
-  defaultBuyerFeeMode: string | null
   defaultPromoterAgreementId: string | null
   forcedPromoterAgreementId: string | null
   paymentGatewayId: string | null
@@ -44,7 +42,6 @@ export function corePromoterProfileFromJson(json: CorePromoterProfileJson): Core
     json.supportEmail ? Email.fromString(json.supportEmail) : null,
     json.supportPhone ? PhoneNumber.fromString(json.supportPhone) : null,
     json.terms ? StringMultilanguage.fromArray(json.terms) : null,
-    json.defaultBuyerFeeMode ? (json.defaultBuyerFeeMode as BuyerFeeMode) : null,
     json.defaultPromoterAgreementId ? Uuid.fromString(json.defaultPromoterAgreementId) : null,
     json.forcedPromoterAgreementId ? Uuid.fromString(json.forcedPromoterAgreementId) : null,
     json.paymentGatewayId ? Uuid.fromString(json.paymentGatewayId) : null,

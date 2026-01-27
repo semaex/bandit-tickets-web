@@ -311,6 +311,7 @@ import type { FileView } from '../../../public-model/File/FileView'
 import { Locale } from '../../../shared/Locale'
 import { Money } from '../../../shared/Money'
 import { Currency } from '../../../shared/Currency'
+import { Percent } from '../../../shared/Percent'
 
 import eventPageTranslations from './event-page.i18n.json'
 import { translationService } from '../../../services/translation.service'
@@ -483,14 +484,36 @@ export default defineComponent({
 
     serviceFee (): Money {
       if (!this.eventPurchaseView) return Money.zero(this.currency)
-      const feeDecimal = this.eventPurchaseView.buyerFeePercent / 100
-      return (this.subtotal as any).multiply(feeDecimal) as Money
+      // buyerFeePercent is in basis points (e.g., 1000 = 10.00%)
+      const percent = Percent.fromInt(this.eventPurchaseView.buyerFeePercent)
+      return (this.subtotal as any).multipliedByPercent(percent) as Money
     },
 
     serviceFeeLabel (): string {
       const baseLabel = this.trans('eventPage.service_fee')
-      const percent = this.eventPurchaseView?.buyerFeePercent ?? 0
-      return percent > 0 ? `${baseLabel} (${percent}%)` : baseLabel
+      const basisPoints = this.eventPurchaseView?.buyerFeePercent ?? 0
+      if (basisPoints === 0) return baseLabel
+      // Convert basis points to percentage (1000 basis points = 10.00%)
+      const percent = Percent.fromInt(basisPoints)
+      const percentStr = percent.toString() // e.g., "10.00" or "10.50"
+      
+      // Format: remove .00 if round, use locale decimal separator if has decimals
+      const parts = percentStr.split('.')
+      const integerPart = parts[0]
+      const decimalPart = parts[1] || ''
+      
+      let formattedPercent: string
+      if (decimalPart === '00' || decimalPart === '') {
+        // Round number: show without decimals
+        formattedPercent = integerPart
+      } else {
+        // Has decimals: use locale separator (comma for Spanish)
+        const locale = this.currentLocale.toString() // e.g., "es-ES"
+        const decimalSeparator = locale.startsWith('es') ? ',' : '.'
+        formattedPercent = integerPart + decimalSeparator + decimalPart
+      }
+      
+      return `${baseLabel} (${formattedPercent}%)`
     },
 
     totalPrice (): Money {

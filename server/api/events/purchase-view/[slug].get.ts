@@ -4,7 +4,6 @@ import { findCoreEventBySlug } from "../../../core-model/Event/CoreEvent.service
 import { findCoreVenueById } from "../../../core-model/Venue/CoreVenue.services"
 import { findCorePromoterAgreementById } from "../../../core-model/PromoterAgreement/CorePromoterAgreement.services"
 import { findCorePromoterProfileById } from "../../../core-model/PromoterProfile/CorePromoterProfile.services"
-import { CoreEventBuyerFee } from "../../../core-model/Event/CoreEventBuyerFee"
 import { EventPurchaseView } from "../../../../public-model/Event/EventPurchaseView"
 import { eventViewFromCoreEventAdapter } from "../../../../public-model/Event/EventView.adapter"
 import { eventBuyerSupportViewFromCoreEventBuyerSupportAdapter } from "../../../../public-model/Event/EventBuyerSupportView.adapter"
@@ -29,15 +28,13 @@ export default defineEventHandler(async (event) => {
 
         const corePromoterAgreement = await findCorePromoterAgreementById(coreEvent.promoterAgreementId.toString())
 
-        const coreEventBuyerFee = CoreEventBuyerFee.fromEventAndPromoterAgreement(coreEvent, corePromoterAgreement!)
-
         const coreEventBuyerSupport = CoreEventBuyerSupport.fromPromoterProfileAndPromoterAgreement(coreEvent.id, corePromoterProfile, corePromoterAgreement)
 
         const eventPurchaseView = new EventPurchaseView(
             eventViewFromCoreEventAdapter(coreEvent),
             coreVenue ? venueViewFromCoreVenueAdapter(coreVenue) : null,
             promoterProfileViewFromCorePromoterProfileAdapter(corePromoterProfile),
-            coreEventBuyerFee.appliedPercent(),
+            coreEvent.buyerFeePercent?.toBasisPoints() ?? 0,
             eventBuyerSupportViewFromCoreEventBuyerSupportAdapter(coreEventBuyerSupport)
         )
 

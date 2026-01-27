@@ -2,13 +2,13 @@ import { CoreEvent } from './CoreEvent'
 import { StringMultilanguage } from '../../../shared/StringMultilanguage'
 import { CoreEventPublicationStatus } from './CoreEventPublicationStatus'
 import { CoreEventLifecycleStatus } from './CoreEventLifecycleStatus'
-import { BuyerFeeMode } from '../../../shared/BuyerFeeMode'
 import { Uuid } from '../../../shared/Uuid'
 import { Locale } from '../../../shared/Locale'
 import { Timezone } from '../../../shared/Timezone'
 import { Time } from '../../../shared/Time'
 import { Url } from '../../../shared/Url'
 import { CountryCode } from '../../../shared/CountryCode'
+import { Percent } from '../../../shared/Percent'
 
 export interface CoreEventJson {
   id: string
@@ -34,7 +34,7 @@ export interface CoreEventJson {
   lifecycleStatus: string
   promoterAgreementId: string
   promoterProfileId: string
-  buyerFeeMode: string | null
+  buyerFeePercent: number | null
   ticketSaleOpensAt: string | null
   ticketSaleClosesAt: string | null
   musicGenres: string[]
@@ -70,7 +70,7 @@ export function coreEventFromCoreApiAdapter(coreEventJson: CoreEventJson): CoreE
     coreEventJson.lifecycleStatus as CoreEventLifecycleStatus,
     Uuid.fromString(coreEventJson.promoterAgreementId),
     Uuid.fromString(coreEventJson.promoterProfileId),
-    coreEventJson.buyerFeeMode ? (coreEventJson.buyerFeeMode as BuyerFeeMode) : null,
+    coreEventJson.buyerFeePercent !== null ? Percent.fromInt(coreEventJson.buyerFeePercent) : null,
     coreEventJson.ticketSaleOpensAt ? new Date(coreEventJson.ticketSaleOpensAt) : null,
     coreEventJson.ticketSaleClosesAt ? new Date(coreEventJson.ticketSaleClosesAt) : null,
     coreEventJson.musicGenres,

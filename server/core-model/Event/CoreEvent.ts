@@ -1,13 +1,13 @@
 import { StringMultilanguage } from '../../../shared/StringMultilanguage'
 import { CoreEventPublicationStatus } from './CoreEventPublicationStatus'
 import { CoreEventLifecycleStatus } from './CoreEventLifecycleStatus'
-import { BuyerFeeMode } from '../../../shared/BuyerFeeMode'
 import { Uuid } from '../../../shared/Uuid'
 import { Locale } from '../../../shared/Locale'
 import { Timezone } from '../../../shared/Timezone'
 import { Time } from '../../../shared/Time'
 import { Url } from '../../../shared/Url'
 import { CountryCode } from '../../../shared/CountryCode'
+import { Percent } from '../../../shared/Percent'
 
 export class CoreEvent {
   constructor(
@@ -34,7 +34,7 @@ export class CoreEvent {
     public readonly lifecycleStatus: CoreEventLifecycleStatus,
     public readonly promoterAgreementId: Uuid,
     public readonly promoterProfileId: Uuid,
-    public readonly buyerFeeMode: BuyerFeeMode | null,
+    public readonly buyerFeePercent: Percent | null,
     public readonly ticketSaleOpensAt: Date | null,
     public readonly ticketSaleClosesAt: Date | null,
     public readonly musicGenres: string[],
