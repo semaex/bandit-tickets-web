@@ -1,0 +1,37 @@
+{
+  "en-GB": {
+    "loading_events": "Loading events…",
+    "upcoming_events_title": "Upcoming events",
+    "upcoming_dates_title": "Upcoming dates",
+    "scheduled_events_count": ":count scheduled events",
+    "empty_state": "No upcoming events for this artist."
+  },
+  "es-ES": {
+    "loading_events": "Cargando eventos…",
+    "upcoming_events_title": "Próximos eventos",
+    "upcoming_dates_title": "Próximas fechas",
+    "scheduled_events_count": ":count eventos programados",
+    "empty_state": "No hay próximos eventos para este artista."
+  },
+  "ca-ES": {
+    "loading_events": "Carregant esdeveniments…",
+    "upcoming_events_title": "Propers esdeveniments",
+    "upcoming_dates_title": "Propers dates",
+    "scheduled_events_count": ":count esdeveniments programats",
+    "empty_state": "No hi ha propers esdeveniments per a aquest artista."
+  },
+  "eu-ES": {
+    "loading_events": "Ekitaldiak kargatzen…",
+    "upcoming_events_title": "Datozen ekitaldiak",
+    "upcoming_dates_title": "Datozen datak",
+    "scheduled_events_count": ":count ekitaldi programatu",
+    "empty_state": "Ez dago artista honentzako datozen ekitaldirik."
+  },
+  "gl-ES": {
+    "loading_events": "Cargando eventos…",
+    "upcoming_events_title": "Próximos eventos",
+    "upcoming_dates_title": "Próximas datas",
+    "scheduled_events_count": ":count eventos programados",
+    "empty_state": "Non hai próximos eventos para este artista."
+  }
+}

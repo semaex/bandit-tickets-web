@@ -6,12 +6,14 @@
 - When referencing components in templates, use PascalCase (e.g., `<HomePage />`, `<MicrositeLayout />`)
 
 ## Vue/Nuxt Best Practices
-- Use Options API for all Vue components (avoid Composition API and `<script setup>`)
-- Use `<script>` tag with `export default` and Options API syntax
+- **Always use Options API for Vue components** – do not use Composition API or `<script setup>`
+- Use `<script lang="ts">` with `export default defineComponent({ ... })` and Options API: `name`, `components`, `props`, `data`, `computed`, `methods`, etc.
+- Do not use `ref()`, `reactive()`, `computed()` from Composition API; use `data()`, `computed: { }`, `methods: { }` instead
 - Use TypeScript for type safety
 - Follow Nuxt 3 conventions for auto-imports (components, composables, utils)
 
 ## CSS/BEM Naming Convention
+- **Do not use `scoped` in component styles** – each component uses a unique BEM block name (e.g. `ArtistEventsPage-hero`, `EventCard-title`), so classes already scope the styles; use global `<style lang="scss">` and avoid `:deep()`
 - **Always use BEM (Block Element Modifier) pattern for CSS classes**
 - Format: `ComponentName-element-subelement--modifier`
 - Example: `HomePage-hero-main-title--active`
@@ -19,6 +21,23 @@
 - Block: component name in PascalCase (e.g., `HomePage`, `MicrositeLayout`)
 - Element: descriptive element name in kebab-case (e.g., `title`, `main-title`)
 - Modifier: optional state or variant, prefixed with `--` (e.g., `--active`, `--disabled`)
+
+### SCSS nesting with BEM
+- **Nest BEM elements and modifiers inside the block using `&-`**
+- The block root is the component class (e.g. `.EventCard`, `.EventsGrid`). All elements and sub-elements are nested under it with `&-element`, `&-element-subelement`, `&-element--modifier`.
+- Example:
+```scss
+.EventCard {
+  &-image-wrap { }
+  &-image {
+    &-wrap { }
+    &-placeholder { }
+  }
+  &-body { }
+  &-title { }
+}
+```
+- Do not repeat the block name in flat classes; nest under the block so the SCSS reflects the BEM structure.
 
 ## Colors
 - **Always prefer using color variables from `assets/scss/partials/theme.scss`**
@@ -34,7 +53,7 @@
 - Use single quotes for strings in JavaScript/TypeScript
 - Use double quotes for HTML attributes
 - Always include closing tags in templates
-- **Never use `scoped` in `<style>` tags** - styles should be global, use BEM naming convention for specificity instead
+- **Never use `scoped` in `<style>` tags** – we use BEM and a unique block name per component (e.g. `ArtistEventsPage`, `EventCard`), so styles are already isolated by class; avoid `:deep()` and keep styles global
 - **Always use `lang="scss"` in `<style>` tags** - all styles should use SCSS syntax
 - **Always use relative paths for imports** - use `./` or `../` instead of `~` or `~/` alias
 - **Never use path aliases** - always use relative imports (e.g., `../services/translation.service` instead of `~/services/translation.service`)

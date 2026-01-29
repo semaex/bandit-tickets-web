@@ -10,3 +10,19 @@ export function findCoreVenueById(id: string): Promise<CoreVenue> {
   return coreApiClient.get<CoreVenueJson >(endpoint)
     .then(response => coreVenueFromCoreApiAdapter(response))
 }
+
+export interface CoreVenueSummaryJson {
+  id: string
+  promoterId: string | null
+  name: string
+  city: string | null
+  countryCode: string | null
+  coords: { latitude: number; longitude: number } | null
+  image: string | null
+  capacity: number | null
+}
+
+export function findCoreVenuesByIds(ids: string[]): Promise<CoreVenueSummaryJson[]> {
+  const endpoint = `${BASE_URL}/summaries`
+  return coreApiClient.post<CoreVenueSummaryJson[]>(endpoint, { ids })
+}

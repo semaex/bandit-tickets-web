@@ -16,17 +16,19 @@ export default defineEventHandler(async (event) => {
     const slug = getRouterParamOrFail(event, 'slug')
 
     return handleCoreApiCall(async () => {
-
         const coreEvent = await findCoreEventBySlug(slug)
 
-        let coreVenue = null
-        if (coreEvent.venueId !== null) {
-            coreVenue = await findCoreVenueById(coreEvent.venueId.toString())
-        }
+        const venueId = coreEvent.venueId?.toString() ?? null
+        const promoterProfileId = coreEvent.promoterProfileId!.toString()
+        const promoterAgreementId = coreEvent.promoterAgreementId.toString()
 
-        const corePromoterProfile = await findCorePromoterProfileById(coreEvent.promoterProfileId!.toString())
-
-        const corePromoterAgreement = await findCorePromoterAgreementById(coreEvent.promoterAgreementId.toString())
+        const [coreVenue, corePromoterProfile, corePromoterAgreement] = await Promise.all([
+            venueId !== null 
+                ? findCoreVenueById(venueId)
+                : Promise.resolve(null),
+            findCorePromoterProfileById(promoterProfileId),
+            findCorePromoterAgreementById(promoterAgreementId)
+        ])
 
         const coreEventBuyerSupport = CoreEventBuyerSupport.fromPromoterProfileAndPromoterAgreement(coreEvent.id, corePromoterProfile, corePromoterAgreement)
 
