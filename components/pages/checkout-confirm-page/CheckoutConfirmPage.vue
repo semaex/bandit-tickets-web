@@ -460,9 +460,14 @@ export default defineComponent({
                 form.appendChild(input)
             })
 
-            // Append form to body and submit
-            document.body.appendChild(form)
-            form.submit()
+            console.log('[Redsys] Datos antes de submit:', {
+                actionUrl: config.actionUrl,
+                settings: { ...config.settings }
+            });
+
+             (document.body as any as HTMLElement).appendChild(form);
+             form.submit()
+            //   (window as any).formRedsys = form
         },
 
         async handleSubmit(e?: Event) {

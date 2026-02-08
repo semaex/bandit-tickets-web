@@ -8,7 +8,7 @@ export interface CorePaymentGatewayJson {
   provider: string
   description: string
   settings: Record<string, any>
-  secretRef: Record<string, any>
+  secretRef: string
   status: string
   createdAt: string
   archivedAt: string | null

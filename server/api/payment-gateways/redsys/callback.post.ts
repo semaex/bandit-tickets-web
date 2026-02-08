@@ -113,7 +113,7 @@ function getValidatedRedsysCallbackData(
     return null
   }
 
-  // Extract paymentAttemptId from Ds_MerchantParameters (Redsys: Ds_Order)
+  // Decode Ds_MerchantParameters; paymentAttemptId comes from Ds_MerchantData (we send it there because Ds_Order is limited to 12 chars)
   let merchantParams: Record<string, any> | null = null
   try {
     const parsed = JSON.parse(decodeBase64UrlToString(Ds_MerchantParameters)) as unknown
@@ -130,9 +130,21 @@ function getValidatedRedsysCallbackData(
     return null
   }
 
-  const paymentAttemptId = merchantParams?.Ds_Order || merchantParams?.DS_ORDER
+  const merchantDataRaw = merchantParams?.Ds_MerchantData ?? merchantParams?.DS_MERCHANTDATA ?? merchantParams?.DS_MERCHANT_MERCHANTDATA
+  let paymentAttemptId: string | null = null
+  if (typeof merchantDataRaw === 'string' && merchantDataRaw.length > 0) {
+    try {
+      const merchantData = JSON.parse(merchantDataRaw) as Record<string, unknown>
+      paymentAttemptId = typeof merchantData?.paymentAttemptId === 'string' ? merchantData.paymentAttemptId : null
+    } catch {
+      // ignore
+    }
+  }
+  if (!paymentAttemptId) {
+    paymentAttemptId = merchantParams?.Ds_Order || merchantParams?.DS_ORDER
+  }
   if (!paymentAttemptId || typeof paymentAttemptId !== 'string') {
-    console.error('[Redsys callback] Missing Ds_Order in merchant parameters')
+    console.error('[Redsys callback] Missing paymentAttemptId (Ds_MerchantData.paymentAttemptId or Ds_Order)')
     setResponseHeader(event, 'content-type', 'text/plain')
     return null
   }
